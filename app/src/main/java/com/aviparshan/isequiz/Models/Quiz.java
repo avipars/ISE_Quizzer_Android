@@ -1,8 +1,6 @@
 package com.aviparshan.isequiz.Models;
 
 
-import java.net.URL;
-
 /**
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz
@@ -11,15 +9,17 @@ public class Quiz {
 
     int weekNum;
     String subject;
-    URL path;
     String url;
     byte[] data;
 
+    public static double version = -2.0;
+
+    String week;
     public byte[] getData() {
         return data;
     }
 
-    public void getData(byte[] ar) {
+    public void setData(byte[] ar) {
         this.data = ar;
     }
 
@@ -31,30 +31,32 @@ public class Quiz {
         this.url = url;
     }
 
-    public Quiz(int weekNum, String subject, String url) {
-        this.weekNum = weekNum;
+    public Quiz(int num, String subject, String url) {
+        this.weekNum = num;
         this.subject = subject;
         this.url = url;
+        this.week = String.format(String.format("Week %s", num));
     }
 
-    public Quiz(int weekNum, String subject, byte[] data) {
-        this.weekNum = weekNum;
+    public Quiz(int num, String subject, byte[] data) {
+        this.weekNum = num;
         this.subject = subject;
         this.data = data;
-    }
-
-    public Quiz(int weekNum, String subject, URL path) {
-        this.weekNum = weekNum;
-        this.subject = subject;
-        this.path = path;
+        this.week = String.format(String.format("Week %s", num));
     }
 
     public int getWeekNum() {
         return weekNum;
     }
 
-    public void setWeekNum(int weekNum) {
-        this.weekNum = weekNum;
+    public void setWeekNum(int num) {
+        this.weekNum = num;
+        this.week = String.format(String.format("Week %s", num));
+
+    }
+
+    public String getWeek() {
+        return week;
     }
 
     public String getSubject() {
@@ -65,11 +67,4 @@ public class Quiz {
         this.subject = subject;
     }
 
-    public URL getPath() {
-        return path;
-    }
-
-    public void setPath(URL path) {
-        this.path = path;
-    }
 }

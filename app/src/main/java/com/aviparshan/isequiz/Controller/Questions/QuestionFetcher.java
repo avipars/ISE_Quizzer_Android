@@ -1,4 +1,4 @@
-package com.aviparshan.isequiz.Controller;
+package com.aviparshan.isequiz.Controller.Questions;
 
 
 import android.content.Context;
@@ -22,8 +22,6 @@ import java.util.List;
 class QuestionFetcher {
     private static final String TAG = QuestionFetcher.class.getSimpleName();
 
-    private static final String QUIZZES_URL = "https://example.com/quizzes.json";
-    private static final String QUIZ_BASE_URL = "https://example.com/quizzes/";
     private static List<QuizQuestion> sQuestions = new ArrayList<>();
 
 //    public static void fetchQuizQuestions(Context context, final FetchQuizQuestionsListener listener) {

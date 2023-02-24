@@ -1,7 +1,7 @@
 package com.aviparshan.isequiz.Models;
 
 
-import com.aviparshan.isequiz.Controller.QuizUtils;
+import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 
 /**
  * ISE Quiz
@@ -56,7 +56,6 @@ public class QuizQuestion {
         setqType(type);
         setWeekNum(week);
     }
-
 
 
     public String getQuestion() {

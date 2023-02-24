@@ -3,14 +3,16 @@ package com.aviparshan.isequiz.View;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aviparshan.isequiz.Controller.QuizAdapter;
+import com.aviparshan.isequiz.Controller.Quiz.QuizAdapter;
+import com.aviparshan.isequiz.Controller.Quiz.QuizFetcher;
 import com.aviparshan.isequiz.Models.Quiz;
-import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
 import com.aviparshan.isequiz.databinding.ActivityMainBinding;
 
@@ -22,10 +24,10 @@ public class Main extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private RecyclerView recyclerView;
+//    private QuestionAdapter qa;
     private QuizAdapter qa;
-
     private List<Quiz> quizzes;
-    private List<QuizQuestion> quizQuestionList;
+//    private List<QuizQuestion> quizQuestionList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +52,52 @@ public class Main extends AppCompatActivity {
 
         setContentView(R.layout.recycler_view);
         recyclerView = findViewById(R.id.rvList);
-        qa = new QuizAdapter(quizQuestionList);
+        QuizFetcher quizFetcher = new QuizFetcher(this);
 
+
+        QuizFetcher.OnQuizzesFetchedListener quizFetcherListener = new QuizFetcher.OnQuizzesFetchedListener() {
+
+            @Override
+            public void onQuizzesFetched(List<Quiz> quiz) {
+                onFetchSuccess(quiz);
+            }
+
+            @Override
+            public void onFetchError(Exception e) {
+                // Handle the quiz fetch error here
+                Toast.makeText(Main.this, "Error: "+ e.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        quizFetcher.fetchQuizzes(quizFetcherListener);
+//        Toast.makeText(this, "Version is: " + Quiz.version, Toast.LENGTH_SHORT).show();
 
     }
+
+//    got the list
+    void onFetchSuccess(List<Quiz> q){
+        quizzes = q;
+        // Create an instance of the QuizAdapter class, passing in the quiz list
+        qa = new QuizAdapter(quizzes);
+        qa.setOnItemClickListener(((itemView, position) -> {
+            Quiz quiz = quizzes.get(position);
+            Toast.makeText(this, "Clicked: " + quiz.getSubject(), Toast.LENGTH_SHORT).show();
+        }));
+        qa.setOnItemLongClickListener(((itemView, position) -> {
+            Quiz quiz = quizzes.get(position);
+            Toast.makeText(this, "LongClick: " + quiz.getWeekNum(), Toast.LENGTH_SHORT).show();
+        }));
+        // Set the layout manager of the RecyclerView to a LinearLayoutManager
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(Main.this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // Set the adapter of the RecyclerView to the QuizAdapter instance
+        recyclerView.setAdapter(qa);
+
+        Toast.makeText(this, "V" + Quiz.version, Toast.LENGTH_SHORT).show();
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,6 +120,7 @@ public class Main extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 //    @Override
 //    public boolean onSupportNavigateUp() {

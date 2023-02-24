@@ -1,4 +1,4 @@
-package com.aviparshan.isequiz.Controller;
+package com.aviparshan.isequiz.Controller.Quiz;
 
 
 import java.io.ByteArrayOutputStream;
@@ -18,6 +18,7 @@ public class QuizUtils {
     public static final int OPEN_ANSWER = 2;
     public static final int UNKNOWN = 3;
 
+    public static final char OPEN='~',ANSWER='@',QUESTION='$',SOLUTION='*';
     public static byte[] readBytesFromStream(InputStream inputStream) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -48,7 +49,5 @@ public class QuizUtils {
         }
         return true;
     }
-
-
 
 }

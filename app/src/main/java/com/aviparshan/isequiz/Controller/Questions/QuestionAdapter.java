@@ -1,4 +1,4 @@
-package com.aviparshan.isequiz.Controller;
+package com.aviparshan.isequiz.Controller.Questions;
 
 
 import android.os.Bundle;
@@ -23,13 +23,13 @@ import java.util.List;
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz.Controller
  */
-public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder> {
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizViewHolder> {
 
    private List<QuizQuestion> quizQuestions;
    private List<QuizQuestion> filteredQuestions;
    private OnItemClickListener listener;
 
-   public QuizAdapter(List<QuizQuestion> quizQuestions) {
+   public QuestionAdapter(List<QuizQuestion> quizQuestions) {
       this.quizQuestions = quizQuestions;
       this.filteredQuestions = quizQuestions;
    }
@@ -37,7 +37,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
    @NonNull
    @Override
    public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.quiz_item, parent, false);
+      View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.question_item, parent, false);
       return new QuizViewHolder(view);
    }
 
