@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "quizzes": [
+    {
+      "number": 1,
+      "subject": "Introduction",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_1.txt"
+    },
+    {
+      "number": 2,
+      "subject": "3D Modeling of primitives",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_2.txt"
+    },
+    {
+      "number": 3,
+      "subject": "Testing, TDD, normals",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_3.txt"
+    },
+    {
+      "number": 4,
+      "subject": "Camera ray construction",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_4.txt"
+    },
+    {
+      "number": 5,
+      "subject": "Ray geometry intersections",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_5.txt"
+    },
+    {
+      "number": 6,
+      "subject": "Color, Ambient, Scene + Lighting Source",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_6.txt"
+    },
+    {
+      "number": 7,
+      "subject": "Lighting Source and Phong Model",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_7.txt"
+    },
+    {
+      "number": 8,
+      "subject": "Shadows + Reflection/Refraction",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_8.txt"
+    },
+    {
+      "number": 9,
+      "subject": "Distributed RT (Picture Improvements)",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_9.txt"
+    },
+    {
+      "number": 10,
+      "subject": "Performance improvements and S.D. Methodologies",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_10.txt"
+    },
+    {
+      "number": 11,
+      "subject": "Testing, Reuse, Dependency and secure software management",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_11.txt"
+    },
+    {
+      "number": 12,
+      "subject": "Software Configuration (version control)",
+      "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_12.txt"
+    }
+  ]
+}
