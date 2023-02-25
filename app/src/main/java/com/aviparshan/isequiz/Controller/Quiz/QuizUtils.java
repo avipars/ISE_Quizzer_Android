@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 /**
  * ISE Quiz
@@ -19,6 +20,19 @@ public class QuizUtils {
     public static final int UNKNOWN = 3;
 
     public static final char OPEN='~',ANSWER='@',QUESTION='$',SOLUTION='*';
+
+//    array of answer types
+    public static final int[] ANSWER_TYPES = {TRUE_FALSE, MULTIPLE_CHOICE, OPEN_ANSWER};
+//    chars as strings
+
+    public static String charToString(char c){
+        return String.valueOf(c);
+    }
+
+    public static String cToS(char c){
+        return charToString(c);
+    }
+
     public static byte[] readBytesFromStream(InputStream inputStream) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -36,6 +50,21 @@ public class QuizUtils {
         inputStream.read(bytes);
         inputStream.close();
         return bytes;
+    }
+
+//    file to bytes
+    public static byte[] convertUsingJavaNIO(File file)
+    {
+        byte[] fileBytes = null;
+        try
+        {
+            fileBytes = Files.readAllBytes(file.toPath());
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return fileBytes;
     }
 
     public static boolean isEqual(byte[] bytes1, byte[] bytes2) {

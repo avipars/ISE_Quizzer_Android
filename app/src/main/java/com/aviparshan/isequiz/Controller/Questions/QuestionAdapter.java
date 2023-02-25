@@ -60,9 +60,10 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizVi
 //         }
 //      }
       QuizQuestion question = filteredQuestions.get(position);
-      holder.questionTextView.setText(question.getQuestion());
-      holder.answerTextView.setText(question.getCorrectAnswer());
-      holder.weekTextView.setText(question.getWeekNum());
+//      holder.questionTextView.setText(question.getQuestion());
+//      holder.answerTextView.setText(question.getCorrectAnswer());
+//      holder.weekTextView.setText(question.getWeekNum());
+      holder.bindQuestion(question);
    }
 
    @Override

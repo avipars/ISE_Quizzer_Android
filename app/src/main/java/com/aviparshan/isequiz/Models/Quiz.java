@@ -1,11 +1,13 @@
 package com.aviparshan.isequiz.Models;
 
 
+import java.io.Serializable;
+
 /**
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz
  */
-public class Quiz {
+public class Quiz implements Serializable {
 
     int weekNum;
     String subject;
@@ -36,6 +38,10 @@ public class Quiz {
         this.subject = subject;
         this.url = url;
         this.week = String.format(String.format("Week %s", num));
+    }
+
+    public Quiz(String subject, String url, int num) {
+        this(num, subject, url);
     }
 
     public Quiz(int num, String subject, byte[] data) {

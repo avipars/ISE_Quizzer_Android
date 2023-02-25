@@ -3,23 +3,27 @@ package com.aviparshan.isequiz.Models;
 
 import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz
  */
-public class QuizQuestion {
+public class QuizQuestion implements Serializable {
 
-    String question;
+    private String question;
 
-    int qType; //fromQuizUtils
+    private int qType; //fromQuizUtils
 
 //    private enum Type{ TRUE_FALSE, MULTIPLE_CHOICE, OPEN_ANSWER, UNKNOWN}
-    int weekNum;
-    String correctAnswer;
-    int correctAnswerNumber;
+    private int weekNum;
+    private String correctAnswer;
+    private int correctAnswerNumber;
 
-    int id = 0;
+    private int id = 0;
 
+    private List<String> possibleAnswers;
     public void setId(int id) {
         this.id = id;
     }
@@ -37,6 +41,23 @@ public class QuizQuestion {
         }
     }
 
+    public List<String> getPossibleAnswers() {
+        return possibleAnswers;
+    }
+
+    public void setPossibleAnswers(List<String> possibleAnswers) {
+        this.possibleAnswers = possibleAnswers;
+    }
+
+    public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int correctAnswerNumber, int id, List<String> possibleAnswers) {
+        this.question = question;
+        this.qType = qType;
+        this.weekNum = weekNum;
+        this.correctAnswer = correctAnswer;
+        this.correctAnswerNumber = correctAnswerNumber;
+        this.id = id;
+        this.possibleAnswers = possibleAnswers;
+    }
 
     public QuizQuestion(String quest, String correctAns){
         this.question = quest;
