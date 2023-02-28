@@ -19,7 +19,7 @@ public class QuizUtils {
     public static final int OPEN_ANSWER = 2;
     public static final int UNKNOWN = 3;
 
-    public static final char OPEN='~',ANSWER='@',QUESTION='$',SOLUTION='*';
+    public static final char OPEN='~',ANSWER='@',QUESTION='$',SOLUTION='*',WEEK_NUM='#';
 
 //    array of answer types
     public static final int[] ANSWER_TYPES = {TRUE_FALSE, MULTIPLE_CHOICE, OPEN_ANSWER};

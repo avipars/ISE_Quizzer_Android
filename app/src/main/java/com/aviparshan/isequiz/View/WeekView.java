@@ -47,6 +47,24 @@ public class WeekView  extends AppCompatActivity  {
 
         questionFetcher = QuestionFetcher.getInstance(this, q);
         questionFetcher.getData();
+
+//        pass in a quiz to the question fetcher
+
+//        fetch the questions (and parse them, then load into the adapter)
+        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
+            @Override
+            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
+                onFetchSuccess(quizQuestions);
+
+            }
+
+            @Override
+            public void onFetchError(Exception e) {
+                // Handle the quiz fetch error here
+
+            }
+        });
+
 //        Toast.makeText(this, subject, Toast.LENGTH_SHORT).show();
 //        change title
 //        questionFetcher = new QuestionFetcher(this, q);

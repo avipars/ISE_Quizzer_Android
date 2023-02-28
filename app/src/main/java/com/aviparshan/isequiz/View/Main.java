@@ -32,8 +32,6 @@ public class Main extends AppCompatActivity {
         quizFetcher = QuizFetcher.getInstance(this);
 
         quizFetcher.fetchQuizzes(quizFetcherListener);
-
-
     }
 
     QuizFetcher.OnQuizzesFetchedListener quizFetcherListener = new QuizFetcher.OnQuizzesFetchedListener() {

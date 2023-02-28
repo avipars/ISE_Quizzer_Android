@@ -1,6 +1,8 @@
 package com.aviparshan.isequiz.Controller.Questions;
 
 
+import static com.aviparshan.isequiz.Controller.Quiz.QuizUtils.cToS;
+
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
@@ -12,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 
@@ -50,21 +53,23 @@ public class QuestionFetcher {
         sQuestions = new ArrayList<>();
 
     }
-    public static QuestionFetcher getInstance(Context context,Quiz q) {
+
+    public static QuestionFetcher getInstance(Context context, Quiz q) {
         if (sQuizFetcher == null) {
             sQuizFetcher = new QuestionFetcher(context, q);
         }
         return sQuizFetcher;
     }
+
     public List<QuizQuestion> getQuizzes() {
         return sQuestions;
     }
 
-    private String getTextFromUrl(String link){
+    private String getTextFromUrl(String link) {
 
-        ArrayList<String> al=new ArrayList<>();
+        ArrayList<String> al = new ArrayList<>();
 
-        try{
+        try {
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
             conn.setDoOutput(true);
@@ -79,7 +84,7 @@ public class QuestionFetcher {
                     al.add(line);
                 }
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return al.get(0).toString();
@@ -96,19 +101,93 @@ public class QuestionFetcher {
             e.printStackTrace();
             return new ArrayList<String>();
         }
-    public List<QuizQuestion> parser(String response){
-//        go through txt file and separate each questions
-//        convert response to array
-        List<String> text = new ArrayList<>();
-            Files.readAllLines(response)
-            String[] lines = response.split("\\r?\\n"); // split on new line
-        String joined = String.join("", text.toArray(new String[text.size()]));
-        String[] blocks = joined.split("\\$");
-        for(String block: blocks){
+    }
 
+    public List<QuizQuestion> parser(String response) {
+        String[] questions = response.split("\\$"); // split on $ (question)
+        List<String> text = new ArrayList<>(Arrays.asList(questions)); // convert to list
+        List<QuizQuestion> sQuestions = new ArrayList<>(); // create a list of questions
+        QuizQuestion q; // create a question object
+        String trimmed, questionText, qAnswer = "";
+        List<String> possibleAnswers = new ArrayList<>();
+        int index; //string index
+        int qType =-1;
+        int qNum = 0;
+//            range loop through each question (only handle T,F and MC for now)
+        for (String s : text) { //foreach block in blocks
+
+            index = s.indexOf(QuizUtils.OPEN_ANSWER);
+            if(index != -1 && quiz.getWeekNum() != 12){  //special case for open answer and skip week 12 due to the non-open answer having it
+                questionText = s.substring(0, index).trim();
+                qType = QuizUtils.OPEN_ANSWER;
+                trimmed = s.substring(index).trim(); // get the answer text
+                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.OPEN)))); //still put in array
+                qAnswer = possibleAnswers.get(0).trim();
+                q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
+                sQuestions.add(q);
+                continue; //skip to next question
+            }
+            //if (s.contains(QuizUtils.OPEN_ANSWER)) {
+            //    questionText = s.substring(0, s.indexOf(cToS(QuizUtils.OPEN_ANSWER))).trim();
+            //    q = new QuizQuestion(questionText, QuizUtils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, qNum, new ArrayList<>());
+            //    sQuestions.add(q);
+            //    ++qNum;
+            //    continue; //skip to next question
+            //}
+
+            index = s.indexOf(QuizUtils.ANSWER); //first answer symbol
+            questionText = s.substring(0, index).trim(); // get the question text
+//                check if questionText contains any characters
+            if (questionText.isEmpty()) break; //empty string, break
+
+//                now remove text until the first answer symbol
+            trimmed = s.substring(index).trim(); // get the answer text
+//split each answer on @ (answer)
+            possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.ANSWER)))); // split on @ (answer)
+            possibleAnswers.replaceAll(String::trim); // trim each answer
+            List<String> possibleAnsEdited = new ArrayList<>();
+
+            int ansIndex = 0, cAnsIndex = 0;
+
+            for (String ans : possibleAnswers) { //go through each answer and put in a list
+//                get the array index of the correct answer
+                possibleAnsEdited.add(ans.trim().replace(cToS(QuizUtils.SOLUTION), ""));
+                if (ans.contains(cToS(QuizUtils.SOLUTION))) { //correct answer, hide the solution symbol
+                    qAnswer = ans.trim().replace(cToS(QuizUtils.SOLUTION), "");
+                    cAnsIndex = ansIndex; //set the correct answer index
+                } else {
+                    ++ansIndex;
+                }
+            }
+            qType = getqType(possibleAnsEdited);
+            q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
+            sQuestions.add(q);
+            ++qNum;
         }
 
+        return sQuestions;
     }
+
+    /**
+     * get the question type given the possible answers list size
+     *
+     * @param possibleAnsEdited
+     * @return
+     */
+    private int getqType(List<String> possibleAnsEdited) {
+        int qType;
+        if (possibleAnsEdited.size() == 1) {
+            qType = QuizUtils.OPEN_ANSWER;
+        } else if (possibleAnsEdited.size() == 2) {
+            qType = QuizUtils.TRUE_FALSE;
+        } else if (possibleAnsEdited.size() > 2) {
+            qType = QuizUtils.MULTIPLE_CHOICE;
+        } else {
+            qType = QuizUtils.UNKNOWN;
+        }
+        return qType;
+    }
+
     public void getData() {
         // RequestQueue initialized
         mRequestQueue = Volley.newRequestQueue(mContext);
@@ -119,7 +198,7 @@ public class QuestionFetcher {
             public void onResponse(String response) {
 //                now parse the response
 
-                Log.d(TAG,"Response" + response.toString());
+                Log.d(TAG, "Response" + response.toString());
                 Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
         }, new Response.ErrorListener() {
@@ -134,7 +213,8 @@ public class QuestionFetcher {
 //        return parser(res[0]);
 
     }
-    public void fetchData(Context mContext, Quiz q){
+
+    public void fetchData(Context mContext, Quiz q) {
         RequestQueue queue = Volley.newRequestQueue(mContext);
         String url = q.getUrl();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -200,29 +280,30 @@ public class QuestionFetcher {
         return json;
     }
 
-    private static List<QuizQuestion> readQuestionsFromUrl(String url) {
-        List<QuizQuestion> questions = new ArrayList<>();
-        try {
-            InputStream inputStream = new URL(url).openStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("\\|");
-                if (parts.length == 2) {
-                    QuizQuestion question = new QuizQuestion(parts[0], parts[1]);
-                    questions.add(question);
-                }
-            }
-            reader.close();
-            inputStream.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading quiz questions from URL", e);
-        }
-        return questions;
-    }
+//    private static List<QuizQuestion> readQuestionsFromUrl(String url) {
+//        List<QuizQuestion> questions = new ArrayList<>();
+//        try {
+//            InputStream inputStream = new URL(url).openStream();
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split("\\|");
+//                if (parts.length == 2) {
+//                    QuizQuestion question = new QuizQuestion(parts[0], parts[1]);
+//                    questions.add(question);
+//                }
+//            }
+//            reader.close();
+//            inputStream.close();
+//        } catch (IOException e) {
+//            Log.e(TAG, "Error reading quiz questions from URL", e);
+//        }
+//        return questions;
+//    }
 
     public interface FetchQuizQuestionsListener {
         void onFetchQuizQuestionsSuccess(List<QuizQuestion> questions);
+
         void onFetchQuizQuestionsFailure();
     }
 
