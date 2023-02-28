@@ -15,34 +15,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz.Controller
  */
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizViewHolder> {
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
 
-   private List<QuizQuestion> quizQuestions;
-   private List<QuizQuestion> filteredQuestions;
+   private final List<QuizQuestion> quizQuestions;
+   //private List<QuizQuestion> filteredQuestions;
    private OnItemClickListener listener;
+   private OnItemLongClickListener longListener;
 
-   public QuestionAdapter(List<QuizQuestion> quizQuestions) {
-      this.quizQuestions = quizQuestions;
-      this.filteredQuestions = quizQuestions;
+   public QuestionAdapter(List<QuizQuestion> q) {
+      this.quizQuestions = q;
+      //this.filteredQuestions = quizQuestions;
    }
 
    @NonNull
    @Override
-   public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+   public QuestionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
       View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.question_item, parent, false);
-      return new QuizViewHolder(view);
+      return new QuestionViewHolder(view);
    }
 
    @Override
-   public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) { //, @NonNull List<Object> payloads
+   public void onBindViewHolder(@NonNull QuestionViewHolder holder, int position) { //, @NonNull List<Object> payloads
 //      if (payloads.isEmpty()) {
 //         super.onBindViewHolder(holder, position, payloads);
 //      }
@@ -59,7 +58,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizVi
 //            }
 //         }
 //      }
-      QuizQuestion question = filteredQuestions.get(position);
+      QuizQuestion question = quizQuestions.get(position);
 //      holder.questionTextView.setText(question.getQuestion());
 //      holder.answerTextView.setText(question.getCorrectAnswer());
 //      holder.weekTextView.setText(question.getWeekNum());
@@ -68,37 +67,58 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizVi
 
    @Override
    public int getItemCount() {
-      return filteredQuestions.size();
+      return quizQuestions.size();
    }
 
    public void setOnItemClickListener(OnItemClickListener listener) {
       this.listener = listener;
    }
 
+   // Define long listener member variable
+   public void setOnItemLongClickListener(QuestionAdapter.OnItemLongClickListener longListener) {
+      this.longListener = longListener;
+   }
    public interface OnItemClickListener {
       void onItemClick(QuizQuestion question);
    }
 
-   public class QuizViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+   // Define interface for long click events
+   public interface OnItemLongClickListener {
+      void onItemLongClick(View itemView, int position);
+   }
+   public class QuestionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
       public TextView questionTextView;
       public TextView answerTextView;
       public TextView weekTextView;
-      public QuizViewHolder(@NonNull View itemView) {
+      public QuestionViewHolder(@NonNull View itemView) {
          super(itemView);
          questionTextView = itemView.findViewById(R.id.questionTextView);
          answerTextView = itemView.findViewById(R.id.answerTextView);
          weekTextView = itemView.findViewById(R.id.weekTextView);
          itemView.setOnClickListener(this);
+         itemView.setOnLongClickListener(this);
       }
 
       @Override
       public void onClick(View v) {
          int position = getAdapterPosition();
          if (position != RecyclerView.NO_POSITION && listener != null) {
-            QuizQuestion question = filteredQuestions.get(position);
+            QuizQuestion question = quizQuestions.get(position);
             listener.onItemClick(question);
          }
+      }
+
+      @Override
+      public boolean onLongClick(View v) {
+         if(longListener != null){
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+               longListener.onItemLongClick(itemView, position);
+               return true;
+            }
+         }
+         return false;
       }
 
       public void bindQuestion(QuizQuestion question) {
@@ -108,17 +128,17 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizVi
       }
    }
 
-   public void filter(String query) {
-      List<QuizQuestion> newFilteredQuestions = new ArrayList<>();
-      for (QuizQuestion question : quizQuestions) {
-         if (question.getQuestion().toLowerCase().contains(query.toLowerCase())) {
-            newFilteredQuestions.add(question);
-         }
-      }
-      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
-      filteredQuestions = newFilteredQuestions;
-      diffResult.dispatchUpdatesTo(this);
-   }
+   //public void filter(String query) {
+   //   List<QuizQuestion> newFilteredQuestions = new ArrayList<>();
+   //   for (QuizQuestion question : quizQuestions) {
+   //      if (question.getQuestion().toLowerCase().contains(query.toLowerCase())) {
+   //         newFilteredQuestions.add(question);
+   //      }
+   //   }
+   //   DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
+   //   filteredQuestions = newFilteredQuestions;
+   //   diffResult.dispatchUpdatesTo(this);
+   //}
 
 //   public void filter(String query) {
 //      filteredQuestions = new ArrayList<>();
@@ -140,18 +160,18 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuizVi
 //      notifyDataSetChanged();
 //   }
 
-   public void sort() {
-      List<QuizQuestion> newFilteredQuestions = new ArrayList<>(filteredQuestions);
-      newFilteredQuestions.sort(new Comparator<QuizQuestion>() {
-         @Override
-         public int compare(QuizQuestion q1, QuizQuestion q2) {
-            return q1.getQuestion().compareTo(q2.getQuestion());
-         }
-      });
-      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
-      filteredQuestions = newFilteredQuestions;
-      diffResult.dispatchUpdatesTo(this);
-   }
+   //public void sort() {
+   //   List<QuizQuestion> newFilteredQuestions = new ArrayList<>(filteredQuestions);
+   //   newFilteredQuestions.sort(new Comparator<QuizQuestion>() {
+   //      @Override
+   //      public int compare(QuizQuestion q1, QuizQuestion q2) {
+   //         return q1.getQuestion().compareTo(q2.getQuestion());
+   //      }
+   //   });
+   //   DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
+   //   filteredQuestions = newFilteredQuestions;
+   //   diffResult.dispatchUpdatesTo(this);
+   //}
 
    private static class QuizDiffCallback extends DiffUtil.Callback {
 

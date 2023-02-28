@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aviparshan.isequiz.Controller.Questions.QuestionAdapter;
@@ -35,7 +36,7 @@ public class WeekView  extends AppCompatActivity  {
         setContentView(R.layout.recycler_view);
 
 //        get the right week then fetch the questions (and answers) and cache them
-//        recyclerView = findViewById(R.id.rvList);
+        recyclerView = findViewById(R.id.rvList);
 
 //        get the bundle from the intent
         Bundle bundle = getIntent().getExtras();
@@ -47,23 +48,28 @@ public class WeekView  extends AppCompatActivity  {
 
         questionFetcher = QuestionFetcher.getInstance(this, q);
         questionFetcher.getData();
+        //when the data is ready, get the data
 
+        quizQuestionList = questionFetcher.getQuizzes();
+        adapter = new QuestionAdapter( quizQuestionList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 //        pass in a quiz to the question fetcher
 
 //        fetch the questions (and parse them, then load into the adapter)
-        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
-            @Override
-            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
-                onFetchSuccess(quizQuestions);
-
-            }
-
-            @Override
-            public void onFetchError(Exception e) {
-                // Handle the quiz fetch error here
-
-            }
-        });
+//        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
+//            @Override
+//            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
+//                onFetchSuccess(quizQuestions);
+//
+//            }
+//
+//            @Override
+//            public void onFetchError(Exception e) {
+//                // Handle the quiz fetch error here
+//
+//            }
+//        });
 
 //        Toast.makeText(this, subject, Toast.LENGTH_SHORT).show();
 //        change title

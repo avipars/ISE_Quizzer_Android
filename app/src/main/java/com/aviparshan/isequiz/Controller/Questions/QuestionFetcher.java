@@ -4,7 +4,6 @@ package com.aviparshan.isequiz.Controller.Questions;
 import static com.aviparshan.isequiz.Controller.Quiz.QuizUtils.cToS;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,8 +24,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,28 +87,34 @@ public class QuestionFetcher {
         return al.get(0).toString();
     }
 
-    public static List<String> LoadTxt(String filename) {
-        String path = GetFilePath(filename, Arrays.asList(".txt"));
-        if (path == null) {
-            return new ArrayList<String>();
-        }
-        try {
-            return Files.readAllLines(Paths.get(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<String>();
-        }
-    }
+    //public static List<String> LoadTxt(String filename) {
+    //    String path = GetFilePath(filename, Arrays.asList(".txt"));
+    //    if (path == null) {
+    //        return new ArrayList<String>();
+    //    }
+    //    try {
+    //        return Files.readAllLines(Paths.get(path));
+    //    } catch (IOException e) {
+    //        e.printStackTrace();
+    //        return new ArrayList<String>();
+    //    }
+    //}
 
+    /**
+     * Parse the response from the server and form into list of question objects
+     * @param response text from server (quiz_#.txt)
+     * @return List of QuizQuestion objects
+     */
     public List<QuizQuestion> parser(String response) {
+
         String[] questions = response.split("\\$"); // split on $ (question)
         List<String> text = new ArrayList<>(Arrays.asList(questions)); // convert to list
         List<QuizQuestion> sQuestions = new ArrayList<>(); // create a list of questions
         QuizQuestion q; // create a question object
         String trimmed, questionText, qAnswer = "";
-        List<String> possibleAnswers = new ArrayList<>();
+        List<String> possibleAnswers;
         int index; //string index
-        int qType =-1;
+        int qType;
         int qNum = 0;
 //            range loop through each question (only handle T,F and MC for now)
         for (String s : text) { //foreach block in blocks
@@ -136,6 +139,11 @@ public class QuestionFetcher {
             //}
 
             index = s.indexOf(QuizUtils.ANSWER); //first answer symbol
+            //do that in java
+            // questionText = new String(s.Take(index).ToArray()).Trim();
+            Log.e(TAG, "parser: " + s + " " + index);
+            if(index <= 0) break; //no answer symbol, break
+
             questionText = s.substring(0, index).trim(); // get the question text
 //                check if questionText contains any characters
             if (questionText.isEmpty()) break; //empty string, break
@@ -197,15 +205,17 @@ public class QuestionFetcher {
             @Override
             public void onResponse(String response) {
 //                now parse the response
-
                 Log.d(TAG, "Response" + response.toString());
-                Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
+
+                sQuestions = parser(response);
+                //Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(mContext, "Error :" + error.toString(), Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "Error :" + error.toString());
+
+                Toast.makeText(mContext, "Error :" + error.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -214,25 +224,7 @@ public class QuestionFetcher {
 
     }
 
-    public void fetchData(Context mContext, Quiz q) {
-        RequestQueue queue = Volley.newRequestQueue(mContext);
-        String url = q.getUrl();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Log.d("Response is: ", response.substring(0, 500));
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("That didn't work!", error.toString());
-            }
-        });
-        queue.add(stringRequest);
-    }
 
 //    public static void fetchQuizQuestions(Context context, final FetchQuizQuestionsListener listener) {
 //        String quizzesJson = readQuizzesJsonFromAsset(context);

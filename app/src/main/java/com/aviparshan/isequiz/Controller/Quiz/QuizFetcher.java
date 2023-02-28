@@ -65,6 +65,7 @@ public class QuizFetcher {
             if (mListener != null) {
                 mListener.onQuizzesFetched(mQuizzes);
             }
+
         }
 
         @Override
@@ -99,6 +100,9 @@ public class QuizFetcher {
                 }
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Error fetching quizzes", e);
+                if (mListener != null) {
+                    mListener.onFetchError(e);
+                }
             }
 
             return quizzes;
