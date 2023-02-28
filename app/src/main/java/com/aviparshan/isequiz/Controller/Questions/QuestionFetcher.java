@@ -29,7 +29,7 @@ import java.util.List;
 public class QuestionFetcher {
     private static final String TAG = QuestionFetcher.class.getSimpleName();
     private static final String CACHE_KEY = "cached_data";
-
+    public boolean done = false;
     private static List<QuizQuestion> sQuestions;
     private final Context mContext;
     private Quiz quiz;
@@ -213,7 +213,7 @@ public class QuestionFetcher {
         return qType;
     }
 
-    public List<QuizQuestion> getData() {
+    public void getData() {
         // RequestQueue initialized
         mRequestQueue = Volley.newRequestQueue(mContext);
 
@@ -226,6 +226,7 @@ public class QuestionFetcher {
                 Toast.makeText(mContext, "R0-100" + response.toString().substring(0, 100), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Response0-200" + response.toString().substring(0, 200));
                 sQuestions = parser(response);
+                done = true;
 
                 //Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
@@ -235,11 +236,11 @@ public class QuestionFetcher {
                 Log.i(TAG, "Error :" + error.toString());
 
                 Toast.makeText(mContext, "Error :" + error.toString(), Toast.LENGTH_SHORT).show();
+                done = true;
             }
         });
 
         mRequestQueue.add(mStringRequest);
-        return sQuestions;
     }
 
 
@@ -336,7 +337,15 @@ public class QuestionFetcher {
         @Override
         protected List<QuizQuestion> doInBackground(Void... voids) {
         //    use the parse method i built
-            sQuestions = getData();
+            getData();
+            //wait for the data to be fetched (when done = true)
+            while(!done){
+                try {
+                    Thread.sleep(300);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             return sQuestions;
 
         }

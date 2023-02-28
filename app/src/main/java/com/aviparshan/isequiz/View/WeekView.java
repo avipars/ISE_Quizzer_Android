@@ -118,9 +118,9 @@ public class WeekView  extends AppCompatActivity  {
 QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.FetchQuestionListener() {
     @Override
     public void onFetchQuestionsSuccess(List<QuizQuestion> questions) {
-        quizQuestionList = questions;
 
-        adapter = new QuestionAdapter( quizQuestionList);
+        quizQuestionList = questions;
+        adapter = new QuestionAdapter(quizQuestionList);
         //click listener
         adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
             @Override
@@ -128,9 +128,8 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
                 Toast.makeText(WeekView.this, "Item " + question.getQuestion() + " clicked", Toast.LENGTH_SHORT).show();
             }
         });
-          //onLongClickListener
 
-          //recyclerView.setHasFixedSize(true); //check if valid
+
         recyclerView.setAdapter(adapter);
     }
 
@@ -160,8 +159,9 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             //invalidate the old RV if it is a different week
-            adapter.notifyDataSetChanged();
-
+            if(adapter != null && adapter.getWeekNum() != weekNum){
+                adapter.invalidateQuestions();
+            }
             return true;
         }
 

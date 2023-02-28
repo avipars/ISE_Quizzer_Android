@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -128,6 +130,36 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
       }
    }
 
+   //getWeekNum
+    public int getWeekNum() {
+        return quizQuestions.get(0).getWeekNum();
+    }
+   //invalidate the list of questions
+    public void invalidateQuestions() {
+        quizQuestions = null;
+        //notifyDataSetChanged();
+    //   use DiffUtil to calculate the difference between the old and new list of questions
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, null));
+        quizQuestions = null;
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+   // insert a question at a specific position
+    public void insertQuestion(int position, QuizQuestion question) {
+        quizQuestions.add(position, question);
+        notifyItemInserted(position);
+    }
+
+
+   //update the list of questions
+    public void updateQuestions(List<QuizQuestion> questions) {
+        this.quizQuestions = questions;
+    //    use DiffUtil to calculate the difference between the old and new list of questions
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, questions));
+        quizQuestions = questions;
+        diffResult.dispatchUpdatesTo(this);
+    }
+
    //public void filter(String query) {
    //   List<QuizQuestion> newFilteredQuestions = new ArrayList<>();
    //   for (QuizQuestion question : quizQuestions) {
@@ -139,39 +171,30 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
    //   filteredQuestions = newFilteredQuestions;
    //   diffResult.dispatchUpdatesTo(this);
    //}
-
-//   public void filter(String query) {
-//      filteredQuestions = new ArrayList<>();
-//      for (QuizQuestion question : quizQuestions) {
-//         if (question.getQuestion().toLowerCase().contains(query.toLowerCase())) {
-//            filteredQuestions.add(question);
-//         }
-//      }
-//      notifyDataSetChanged();
-//   }
-
-//   public void sort() {
-//      filteredQuestions.sort(new Comparator<QuizQuestion>() {
-//         @Override
-//         public int compare(QuizQuestion q1, QuizQuestion q2) {
-//            return q1.getQuestion().compareTo(q2.getQuestion());
-//         }
-//      });
-//      notifyDataSetChanged();
-//   }
+   //
 
    //public void sort() {
-   //   List<QuizQuestion> newFilteredQuestions = new ArrayList<>(filteredQuestions);
-   //   newFilteredQuestions.sort(new Comparator<QuizQuestion>() {
+   //   quizQuestions.sort(new Comparator<QuizQuestion>() {
    //      @Override
    //      public int compare(QuizQuestion q1, QuizQuestion q2) {
    //         return q1.getQuestion().compareTo(q2.getQuestion());
    //      }
    //   });
-   //   DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
-   //   filteredQuestions = newFilteredQuestions;
-   //   diffResult.dispatchUpdatesTo(this);
+   //   notifyDataSetChanged();
    //}
+
+   public void sort() {
+      List<QuizQuestion> newFilteredQuestions = new ArrayList<>(quizQuestions);
+      newFilteredQuestions.sort(new Comparator<QuizQuestion>() {
+         @Override
+         public int compare(QuizQuestion q1, QuizQuestion q2) {
+            return q1.getQuestion().compareTo(q2.getQuestion());
+         }
+      });
+      DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, newFilteredQuestions));
+      quizQuestions = newFilteredQuestions;
+      diffResult.dispatchUpdatesTo(this);
+   }
 
    private static class QuizDiffCallback extends DiffUtil.Callback {
 
