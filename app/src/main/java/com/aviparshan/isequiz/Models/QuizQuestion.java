@@ -17,14 +17,11 @@ public class QuizQuestion implements Serializable {
     private String question;
 
     private int qType; //fromQuizUtils
-
-//    private enum Type{ TRUE_FALSE, MULTIPLE_CHOICE, OPEN_ANSWER, UNKNOWN}
     private int weekNum;
 //    static variable for week number
     private static int weekNumber = 0;
     private String correctAnswer;
     private int correctAnswerIndex; //index to the right element in the possible answers list
-
     private int id = 0;
 
     private List<String> possibleAnswers;

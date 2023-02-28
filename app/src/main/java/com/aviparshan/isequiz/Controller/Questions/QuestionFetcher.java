@@ -4,6 +4,7 @@ package com.aviparshan.isequiz.Controller.Questions;
 import static com.aviparshan.isequiz.Controller.Quiz.QuizUtils.cToS;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,13 +18,6 @@ import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,25 +30,32 @@ public class QuestionFetcher {
     private static final String TAG = QuestionFetcher.class.getSimpleName();
     private static final String CACHE_KEY = "cached_data";
 
-    private static List<QuizQuestion> sQuestions = new ArrayList<>();
+    private static List<QuizQuestion> sQuestions;
     private final Context mContext;
-    private final Quiz quiz;
+    private Quiz quiz;
     private static QuestionFetcher sQuizFetcher;
     //    get the quiz object then, fetch the questions from the url
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
 
     public QuestionFetcher(Context con, Quiz q) {
-        this.mContext = con;
+        this.mContext = con.getApplicationContext();
         this.quiz = q;
         sQuestions = new ArrayList<>();
-
     }
 
     public static QuestionFetcher getInstance(Context context, Quiz q) {
         if (sQuizFetcher == null) {
             sQuizFetcher = new QuestionFetcher(context, q);
         }
+        //check if the quiz is the same as the one in the cache
+        if(sQuizFetcher.quiz != q){
+            sQuizFetcher.quiz = q; //update the quiz
+            sQuestions.clear(); //clear the existing questions
+        //    fetch the questions from the new quiz
+
+        }
+
         return sQuizFetcher;
     }
 
@@ -62,118 +63,134 @@ public class QuestionFetcher {
         return sQuestions;
     }
 
-    private String getTextFromUrl(String link) {
-
-        ArrayList<String> al = new ArrayList<>();
-
-        try {
-            URL url = new URL(link);
-            URLConnection conn = url.openConnection();
-            conn.setDoOutput(true);
-            conn.connect();
-
-            InputStream is = conn.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-
-            try (BufferedReader br = new BufferedReader(isr)) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    al.add(line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return al.get(0).toString();
-    }
-
-    //public static List<String> LoadTxt(String filename) {
-    //    String path = GetFilePath(filename, Arrays.asList(".txt"));
-    //    if (path == null) {
-    //        return new ArrayList<String>();
-    //    }
+    //private String getTextFromUrl(String link) {
+    //
+    //    ArrayList<String> al = new ArrayList<>();
+    //
     //    try {
-    //        return Files.readAllLines(Paths.get(path));
+    //        URL url = new URL(link);
+    //        URLConnection conn = url.openConnection();
+    //        conn.setDoOutput(true);
+    //        conn.connect();
+    //
+    //        InputStream is = conn.getInputStream();
+    //        InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+    //
+    //        try (BufferedReader br = new BufferedReader(isr)) {
+    //            String line;
+    //            while ((line = br.readLine()) != null) {
+    //                al.add(line);
+    //            }
+    //        }
     //    } catch (IOException e) {
     //        e.printStackTrace();
-    //        return new ArrayList<String>();
     //    }
+    //    return al.get(0).toString();
     //}
+
+
 
     /**
      * Parse the response from the server and form into list of question objects
-     * @param response text from server (quiz_#.txt)
+     * @param list text from server (quiz_#.txt)
      * @return List of QuizQuestion objects
      */
+
+    private void printList(List<String> list){
+        int i = 0;
+        for(String s : list){
+
+            Log.d(TAG, "print: " + s + " " + i);
+            i++;
+        }
+    }
     public List<QuizQuestion> parser(String response) {
+        List<QuizQuestion> sQuestions = new ArrayList<>(); // create an empty list of questions
+        AsyncTask.execute(() -> {
+            QuizQuestion q; // create a question object
+            String trimmed, questionText, qAnswer = "";
+            List<String> possibleAnswers;
+            String[] arr = response.split("");
+            String joined = String.join("", arr);
+            List<String> blocks = Arrays.asList(joined.split("\\$")); // split on $ (question)
 
-        String[] questions = response.split("\\$"); // split on $ (question)
-        List<String> text = new ArrayList<>(Arrays.asList(questions)); // convert to list
-        List<QuizQuestion> sQuestions = new ArrayList<>(); // create a list of questions
-        QuizQuestion q; // create a question object
-        String trimmed, questionText, qAnswer = "";
-        List<String> possibleAnswers;
-        int index; //string index
-        int qType;
-        int qNum = 0;
+
+            //List<String> text = new ArrayList<>(Arrays.asList(blocks)); // convert to list
+
+            int index; //string index
+            int qType;
+            int qNum = 0;
+            int ansIndex, cAnsIndex;
 //            range loop through each question (only handle T,F and MC for now)
-        for (String s : text) { //foreach block in blocks
+//        skip first block (empty)
 
-            index = s.indexOf(QuizUtils.OPEN_ANSWER);
-            if(index != -1 && quiz.getWeekNum() != 12){  //special case for open answer and skip week 12 due to the non-open answer having it
-                questionText = s.substring(0, index).trim();
-                qType = QuizUtils.OPEN_ANSWER;
-                trimmed = s.substring(index).trim(); // get the answer text
-                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.OPEN)))); //still put in array
-                qAnswer = possibleAnswers.get(0).trim();
-                q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
-                sQuestions.add(q);
-                continue; //skip to next question
-            }
-            //if (s.contains(QuizUtils.OPEN_ANSWER)) {
-            //    questionText = s.substring(0, s.indexOf(cToS(QuizUtils.OPEN_ANSWER))).trim();
-            //    q = new QuizQuestion(questionText, QuizUtils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, qNum, new ArrayList<>());
-            //    sQuestions.add(q);
-            //    ++qNum;
-            //    continue; //skip to next question
-            //}
+            for (int i = 1; i < blocks.size()-1; ++i) { //foreach block in blocks
+                String s = blocks.get(i);
+                //open answer
+                index = s.indexOf(cToS(QuizUtils.OPEN));
+                if(index != -1 && quiz.getWeekNum() != 12){  //special case for open answer and skip week 12 due to the non-open answer having it
+                    questionText = s.substring(0, index).trim();
+                    qType = QuizUtils.OPEN_ANSWER;
+                    trimmed = s.substring(index).trim(); // get the answer text
+                    possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.OPEN)))); //still put in array
+                    qAnswer = possibleAnswers.get(0).trim();
+                    q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
+                    sQuestions.add(q);
+                    continue; //skip to next question
+                }
+                //skip the first block (empty) or contains
 
-            index = s.indexOf(QuizUtils.ANSWER); //first answer symbol
-            //do that in java
-            // questionText = new String(s.Take(index).ToArray()).Trim();
-            Log.e(TAG, "parser: " + s + " " + index);
-            if(index <= 0) break; //no answer symbol, break
+                index = s.indexOf(cToS(QuizUtils.ANSWER)); //first answer symbol
+                //do that in java
+                // questionText = new String(s.Take(index).ToArray()).Trim();
+                if(index <= 0 ) {
+                    Log.e(TAG, "parser: " + s + " " + index);
+                    //printList(text);
+                    //continue; //no answer symbol, break
+                }
+                if (index >= 0) { // make sure index is within bounds
+                    questionText = s.substring(0, index).trim(); // get the question text
+                } else {
+                    // handle the case where index is out of bounds
+                    // for example, print an error message or set a default value for questionText
+                    //Toast.makeText(mContext, "AVIHAHA", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "AVIHAHA: " + s + " " + index);
+                    break;
+                }
 
-            questionText = s.substring(0, index).trim(); // get the question text
+                //questionText = s.substring(0, index).trim(); // get the question text
 //                check if questionText contains any characters
-            if (questionText.isEmpty()) break; //empty string, break
+                if (questionText.isEmpty()) continue; //empty string, break
 
 //                now remove text until the first answer symbol
-            trimmed = s.substring(index).trim(); // get the answer text
+                trimmed = s.substring(index).trim(); // get the answer text
 //split each answer on @ (answer)
-            possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.ANSWER)))); // split on @ (answer)
-            possibleAnswers.replaceAll(String::trim); // trim each answer
-            List<String> possibleAnsEdited = new ArrayList<>();
+                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.ANSWER)))); // split on @ (answer)
+                possibleAnswers.replaceAll(String::trim); // trim each answer
+                List<String> possibleAnsEdited = new ArrayList<>();
 
-            int ansIndex = 0, cAnsIndex = 0;
+                ansIndex = 0; //reset answer index
+                cAnsIndex = 0; //reset correct answer index for each question
 
-            for (String ans : possibleAnswers) { //go through each answer and put in a list
+                for (String ans : possibleAnswers) { //go through each answer and put in a list
 //                get the array index of the correct answer
-                possibleAnsEdited.add(ans.trim().replace(cToS(QuizUtils.SOLUTION), ""));
-                if (ans.contains(cToS(QuizUtils.SOLUTION))) { //correct answer, hide the solution symbol
-                    qAnswer = ans.trim().replace(cToS(QuizUtils.SOLUTION), "");
-                    cAnsIndex = ansIndex; //set the correct answer index
-                } else {
-                    ++ansIndex;
+                    possibleAnsEdited.add(ans.trim().replace("*", ""));
+                    if (ans.contains("*")) { //correct answer, hide the solution symbol
+                        qAnswer = ans.trim().replace("*", "");
+                        cAnsIndex = ansIndex; //set the correct answer index
+                    } else {
+                        ++ansIndex;
+                    }
                 }
-            }
-            qType = getqType(possibleAnsEdited);
-            q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
-            sQuestions.add(q);
-            ++qNum;
-        }
 
+                qType = getqType(possibleAnsEdited);
+                q = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
+                sQuestions.add(q);
+                ++qNum;
+            }
+        });
         return sQuestions;
+
     }
 
     /**
@@ -196,7 +213,7 @@ public class QuestionFetcher {
         return qType;
     }
 
-    public void getData() {
+    public List<QuizQuestion> getData() {
         // RequestQueue initialized
         mRequestQueue = Volley.newRequestQueue(mContext);
 
@@ -205,9 +222,11 @@ public class QuestionFetcher {
             @Override
             public void onResponse(String response) {
 //                now parse the response
-                Log.d(TAG, "Response" + response.toString());
-
+//                Log.d(TAG, "Response" + response.toString());
+                Toast.makeText(mContext, "R0-100" + response.toString().substring(0, 100), Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Response0-200" + response.toString().substring(0, 200));
                 sQuestions = parser(response);
+
                 //Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
         }, new Response.ErrorListener() {
@@ -220,9 +239,9 @@ public class QuestionFetcher {
         });
 
         mRequestQueue.add(mStringRequest);
-//        return parser(res[0]);
-
+        return sQuestions;
     }
+
 
 
 
@@ -257,20 +276,20 @@ public class QuestionFetcher {
 //        }
 //    }
 
-    private static String readQuizzesJsonFromAsset(Context context) {
-        String json = null;
-        try {
-            InputStream inputStream = context.getAssets().open("quizzes.json");
-            int size = inputStream.available();
-            byte[] buffer = new byte[size];
-            inputStream.read(buffer);
-            inputStream.close();
-            json = new String(buffer, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading quizzes JSON from asset", e);
-        }
-        return json;
-    }
+    //private static String readQuizzesJsonFromAsset(Context context) {
+    //    String json = null;
+    //    try {
+    //        InputStream inputStream = context.getAssets().open("quizzes.json");
+    //        int size = inputStream.available();
+    //        byte[] buffer = new byte[size];
+    //        inputStream.read(buffer);
+    //        inputStream.close();
+    //        json = new String(buffer, StandardCharsets.UTF_8);
+    //    } catch (IOException e) {
+    //        Log.e(TAG, "Error reading quizzes JSON from asset", e);
+    //    }
+    //    return json;
+    //}
 
 //    private static List<QuizQuestion> readQuestionsFromUrl(String url) {
 //        List<QuizQuestion> questions = new ArrayList<>();
@@ -293,11 +312,47 @@ public class QuestionFetcher {
 //        return questions;
 //    }
 
-    public interface FetchQuizQuestionsListener {
-        void onFetchQuizQuestionsSuccess(List<QuizQuestion> questions);
+    public interface FetchQuestionListener {
+        void onFetchQuestionsSuccess(List<QuizQuestion> questions);
 
-        void onFetchQuizQuestionsFailure();
+        void onFetchQuestionsFailure();
     }
 
+    public void fetchQuestions(FetchQuestionListener listener) {
+        new QuestionFetcher.FetchQuestionsTask(listener).execute();
+    }
 
+    /*
+    * add the quizWEEk
+    * */
+
+    private class FetchQuestionsTask extends AsyncTask<Void, Void, List<QuizQuestion>>{
+        private final FetchQuestionListener listener;
+
+        public FetchQuestionsTask(FetchQuestionListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        protected List<QuizQuestion> doInBackground(Void... voids) {
+        //    use the parse method i built
+            sQuestions = getData();
+            return sQuestions;
+
+        }
+
+        @Override
+        protected void onPostExecute(List<QuizQuestion> questions) {
+            super.onPostExecute(questions);
+            if (questions != null && listener != null) {
+                listener.onFetchQuestionsSuccess(questions);
+            } else if(listener != null){
+                listener.onFetchQuestionsFailure();
+                Log.e(TAG, "Listener is null");
+            }
+            else{
+                Log.e(TAG, "Error reading quiz questions from URL");
+            }
+        }
+    }
 }

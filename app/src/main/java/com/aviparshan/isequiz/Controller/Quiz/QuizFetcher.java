@@ -62,8 +62,11 @@ public class QuizFetcher {
         @Override
         protected void onPostExecute(List<Quiz> quizzes) {
             mQuizzes = quizzes;
-            if (mListener != null) {
+            if (mListener != null && mQuizzes != null) {
                 mListener.onQuizzesFetched(mQuizzes);
+            }
+            else{
+                Log.e(TAG, "Error fetching quizzes");
             }
 
         }
@@ -98,6 +101,9 @@ public class QuizFetcher {
                     Quiz quiz = new Quiz(quizNumber, quizSubject, quizUrl);
                     quizzes.add(quiz);
                 }
+
+            //    now save the quizzes to the database
+
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Error fetching quizzes", e);
                 if (mListener != null) {

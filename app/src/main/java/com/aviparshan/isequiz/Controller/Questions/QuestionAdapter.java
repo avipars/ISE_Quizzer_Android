@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
 
-   private final List<QuizQuestion> quizQuestions;
+   private List<QuizQuestion> quizQuestions;
    //private List<QuizQuestion> filteredQuestions;
    private OnItemClickListener listener;
    private OnItemLongClickListener longListener;
@@ -124,7 +124,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
       public void bindQuestion(QuizQuestion question) {
          questionTextView.setText(question.getQuestion());
          answerTextView.setText(question.getCorrectAnswer());
-         weekTextView.setText(question.getWeekNum());
+         weekTextView.setText(String.valueOf(question.getWeekNum()));
       }
    }
 

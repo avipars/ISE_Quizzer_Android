@@ -12,18 +12,12 @@ public class Quiz implements Serializable {
     int weekNum;
     String subject;
     String url;
-    byte[] data;
+
 
     public static double version = -2.0;
 
     String week;
-    public byte[] getData() {
-        return data;
-    }
 
-    public void setData(byte[] ar) {
-        this.data = ar;
-    }
 
     public String getUrl() {
         return url;
@@ -40,16 +34,6 @@ public class Quiz implements Serializable {
         this.week = String.format(String.format("Week %s", num));
     }
 
-    public Quiz(String subject, String url, int num) {
-        this(num, subject, url);
-    }
-
-    public Quiz(int num, String subject, byte[] data) {
-        this.weekNum = num;
-        this.subject = subject;
-        this.data = data;
-        this.week = String.format(String.format("Week %s", num));
-    }
 
     public int getWeekNum() {
         return weekNum;
@@ -73,4 +57,27 @@ public class Quiz implements Serializable {
         this.subject = subject;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Quiz)) return false;
+
+        Quiz quiz = (Quiz) o;
+
+        if (getWeekNum() != quiz.getWeekNum()) return false;
+        if (getSubject() != null ? !getSubject().equals(quiz.getSubject()) : quiz.getSubject() != null)
+            return false;
+        if (getUrl() != null ? !getUrl().equals(quiz.getUrl()) : quiz.getUrl() != null)
+            return false;
+        return getWeek() != null ? getWeek().equals(quiz.getWeek()) : quiz.getWeek() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getWeekNum();
+        result = 31 * result + (getSubject() != null ? getSubject().hashCode() : 0);
+        result = 31 * result + (getUrl() != null ? getUrl().hashCode() : 0);
+        result = 31 * result + (getWeek() != null ? getWeek().hashCode() : 0);
+        return result;
+    }
 }

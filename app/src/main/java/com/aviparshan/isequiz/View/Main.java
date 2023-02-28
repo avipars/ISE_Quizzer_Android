@@ -32,6 +32,10 @@ public class Main extends AppCompatActivity {
         quizFetcher = QuizFetcher.getInstance(this);
 
         quizFetcher.fetchQuizzes(quizFetcherListener);
+        // Set the layout manager of the RecyclerView to a LinearLayoutManager
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(Main.this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
     }
 
     QuizFetcher.OnQuizzesFetchedListener quizFetcherListener = new QuizFetcher.OnQuizzesFetchedListener() {
@@ -70,14 +74,10 @@ public class Main extends AppCompatActivity {
             passDataToNextActivity(quiz);
 //            Toast.makeText(this, "LongClick: " + quiz.getWeekNum(), Toast.LENGTH_SHORT).show();
         }));
-        // Set the layout manager of the RecyclerView to a LinearLayoutManager
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(Main.this);
-        recyclerView.setLayoutManager(layoutManager);
+
 
         // Set the adapter of the RecyclerView to the QuizAdapter instance
         recyclerView.setAdapter(qa);
-
-
     }
 
 

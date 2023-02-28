@@ -20,6 +20,7 @@ public class QuizUtils {
     public static final int UNKNOWN = 3;
 
     public static final char OPEN='~',ANSWER='@',QUESTION='$',SOLUTION='*',WEEK_NUM='#';
+    public static final String OPEN_S="~",ANSWER_S="@",QUESTION_S="$",SOLUTION_S="*",WEEK_NUM_S="#";
 
 //    array of answer types
     public static final int[] ANSWER_TYPES = {TRUE_FALSE, MULTIPLE_CHOICE, OPEN_ANSWER};

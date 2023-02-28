@@ -2,8 +2,10 @@ package com.aviparshan.isequiz.View;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -44,16 +46,27 @@ public class WeekView  extends AppCompatActivity  {
         url = bundle.getString("quiz_url");
         subject = bundle.getString("quiz_subject");
         q = new Quiz(weekNum,subject,url);
-        setTitle(q.getWeek());
-
         questionFetcher = QuestionFetcher.getInstance(this, q);
-        questionFetcher.getData();
+        //questionFetcher.getData();
+        questionFetcher.fetchQuestions(questionListener);
+        setTitle(q.getWeek());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(WeekView.this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        //recyclerView.setHasFixedSize(true);
+        //invalidate the old RV if it is a different week
+        //if(adapter != null && adapter.getWeekNum() != weekNum){
+        //    adapter.invalidate();
+        //}
+
+
         //when the data is ready, get the data
 
-        quizQuestionList = questionFetcher.getQuizzes();
-        adapter = new QuestionAdapter( quizQuestionList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        //quizQuestionList = questionFetcher.getQuizzes();
+        //adapter = new QuestionAdapter( quizQuestionList);
+        ////recyclerView.setHasFixedSize(true); //check if valid
+        //
+        //recyclerView.setAdapter(adapter);
 //        pass in a quiz to the question fetcher
 
 //        fetch the questions (and parse them, then load into the adapter)
@@ -102,7 +115,34 @@ public class WeekView  extends AppCompatActivity  {
 
 
     }
+QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.FetchQuestionListener() {
+    @Override
+    public void onFetchQuestionsSuccess(List<QuizQuestion> questions) {
+        quizQuestionList = questions;
 
+        adapter = new QuestionAdapter( quizQuestionList);
+        //click listener
+        adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(QuizQuestion question) {
+                Toast.makeText(WeekView.this, "Item " + question.getQuestion() + " clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+          //onLongClickListener
+
+          //recyclerView.setHasFixedSize(true); //check if valid
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onFetchQuestionsFailure() {
+        Log.e("WeekView", "onFetchQuestionsFailure: " + "Failed to fetch questions");
+        Toast.makeText(WeekView.this, "onFetchQuestionsFailure: ", Toast.LENGTH_SHORT).show();
+    }
+
+
+
+    };
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -119,6 +159,9 @@ public class WeekView  extends AppCompatActivity  {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //invalidate the old RV if it is a different week
+            adapter.notifyDataSetChanged();
+
             return true;
         }
 
