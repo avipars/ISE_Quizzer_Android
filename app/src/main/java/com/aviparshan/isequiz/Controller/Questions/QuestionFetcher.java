@@ -17,6 +17,9 @@ import com.android.volley.toolbox.Volley;
 import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
+import com.aviparshan.isequiz.R;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,12 +52,12 @@ public class QuestionFetcher {
             sQuizFetcher = new QuestionFetcher(context, q);
         }
         //check if the quiz is the same as the one in the cache
-        if(sQuizFetcher.quiz != q){
-            sQuizFetcher.quiz = q; //update the quiz
-            sQuestions.clear(); //clear the existing questions
-        //    fetch the questions from the new quiz
-
-        }
+//        if(sQuizFetcher.quiz != q){
+//            sQuizFetcher.quiz = q; //update the quiz
+//            sQuestions.clear(); //clear the existing questions
+//        //    fetch the questions from the new quiz
+//
+//        }
 
         return sQuizFetcher;
     }
@@ -88,6 +91,28 @@ public class QuestionFetcher {
     //    return al.get(0).toString();
     //}
 
+
+//    public JSONObject getVolleyCacheEntryByUrl(Activity c,
+//                                               String relative_url) {
+//        // RequestQueue queue = Volley.newRequestQueue(c);
+//        String cachedResponse = new String(AppController
+//                .getInstance()
+//                .getRequestQueue()
+//                .getCache()
+//                .get(c.getResources().getString(R.string.base_url)
+//                        + relative_url).data);
+//
+//        try {
+//            JSONObject cacheObj = new JSONObject(cachedResponse);
+//            Log.e("CacheResult", cacheObj.toString());
+//            return cacheObj;
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//
+//    }
 
 
     /**
@@ -189,6 +214,7 @@ public class QuestionFetcher {
                 ++qNum;
             }
         });
+        done = true;
         return sQuestions;
 
     }
@@ -226,7 +252,9 @@ public class QuestionFetcher {
                 Toast.makeText(mContext, "R0-100" + response.toString().substring(0, 100), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Response0-200" + response.toString().substring(0, 200));
                 sQuestions = parser(response);
-                done = true;
+//                done = true;
+//now fill the adapter, notify the adapter, and set the adapter to the recycler view
+
 
                 //Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
@@ -240,7 +268,7 @@ public class QuestionFetcher {
             }
         });
 
-        mRequestQueue.add(mStringRequest);
+        mRequestQueue.add(mStringRequest).setShouldCache(true);
     }
 
 

@@ -121,6 +121,7 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
 
         quizQuestionList = questions;
         adapter = new QuestionAdapter(quizQuestionList);
+        adapter.notifyDataSetChanged();
         //click listener
         adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
             @Override
