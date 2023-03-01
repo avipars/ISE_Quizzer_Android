@@ -17,9 +17,6 @@ import com.android.volley.toolbox.Volley;
 import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
-import com.aviparshan.isequiz.R;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +122,7 @@ public class QuestionFetcher {
         int i = 0;
         for(String s : list){
 
-            Log.d(TAG, "print: " + s + " " + i);
+            Log.e(TAG, "print: " + s + " " + i);
             i++;
         }
     }
@@ -168,9 +165,9 @@ public class QuestionFetcher {
                 index = s.indexOf(cToS(QuizUtils.ANSWER)); //first answer symbol
                 //do that in java
                 // questionText = new String(s.Take(index).ToArray()).Trim();
-                if(index <= 0 ) {
+                if(index <= -1 ) {
                     Log.e(TAG, "parser: " + s + " " + index);
-                    //printList(text);
+                    printList(blocks);
                     //continue; //no answer symbol, break
                 }
                 if (index >= 0) { // make sure index is within bounds
@@ -180,6 +177,7 @@ public class QuestionFetcher {
                     // for example, print an error message or set a default value for questionText
                     //Toast.makeText(mContext, "AVIHAHA", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "AVIHAHA: " + s + " " + index);
+                    printList(blocks);
                     break;
                 }
 
@@ -268,7 +266,8 @@ public class QuestionFetcher {
             }
         });
 
-        mRequestQueue.add(mStringRequest).setShouldCache(true);
+        mRequestQueue.add(mStringRequest);
+    //    .setShouldCache(true)
     }
 
 

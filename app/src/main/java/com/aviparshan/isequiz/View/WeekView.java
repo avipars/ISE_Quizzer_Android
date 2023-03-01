@@ -38,7 +38,7 @@ public class WeekView  extends AppCompatActivity  {
         setContentView(R.layout.recycler_view);
 
 //        get the right week then fetch the questions (and answers) and cache them
-        recyclerView = findViewById(R.id.rvList);
+
 
 //        get the bundle from the intent
         Bundle bundle = getIntent().getExtras();
@@ -46,82 +46,38 @@ public class WeekView  extends AppCompatActivity  {
         url = bundle.getString("quiz_url");
         subject = bundle.getString("quiz_subject");
         q = new Quiz(weekNum,subject,url);
-        questionFetcher = QuestionFetcher.getInstance(this, q);
-        //questionFetcher.getData();
-        questionFetcher.fetchQuestions(questionListener);
         setTitle(q.getWeek());
+        setUp(q);
+    }
+
+    private void setUp(Quiz q){
+        recyclerView = findViewById(R.id.rvList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(WeekView.this);
         recyclerView.setLayoutManager(layoutManager);
-
-        //recyclerView.setHasFixedSize(true);
-        //invalidate the old RV if it is a different week
-        //if(adapter != null && adapter.getWeekNum() != weekNum){
-        //    adapter.invalidate();
-        //}
-
-
-        //when the data is ready, get the data
-
-        //quizQuestionList = questionFetcher.getQuizzes();
-        //adapter = new QuestionAdapter( quizQuestionList);
-        ////recyclerView.setHasFixedSize(true); //check if valid
-        //
-        //recyclerView.setAdapter(adapter);
-//        pass in a quiz to the question fetcher
-
-//        fetch the questions (and parse them, then load into the adapter)
-//        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
-//            @Override
-//            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
-//                onFetchSuccess(quizQuestions);
-//
-//            }
-//
-//            @Override
-//            public void onFetchError(Exception e) {
-//                // Handle the quiz fetch error here
-//
-//            }
-//        });
-
-//        Toast.makeText(this, subject, Toast.LENGTH_SHORT).show();
-//        change title
-//        questionFetcher = new QuestionFetcher(this, q);
-//        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
-//            @Override
-//            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
-//                onFetchSuccess(quizQuestions);
-//            }
-//
-//            @Override
-//            public void onFetchError(Exception e) {
-//                // Handle the quiz fetch error here
-//            }
-//        });
-//        adapter = new QuestionAdapter( quizQuestionList);
-
-//        questionFetcher = new QuestionFetcher(this, q);
-//        questionFetcher.fetchQuestions(weekNum, new QuestionFetcher.OnQuestionsFetchedListener() {
-//            @Override
-//            public void onQuestionsFetched(List<QuizQuestion> quizQuestions) {
-//                onFetchSuccess(quizQuestions);
-//            }
-//
-//            @Override
-//            public void onFetchError(Exception e) {
-//                // Handle the quiz fetch error here
-//            }
-//        });
-
-
+        questionFetcher = QuestionFetcher.getInstance(this, q);
+        questionFetcher.fetchQuestions(questionListener);
+    //    set the adapter
+        adapter = new QuestionAdapter(quizQuestionList);
+        recyclerView.setAdapter(adapter);
     }
 QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.FetchQuestionListener() {
     @Override
     public void onFetchQuestionsSuccess(List<QuizQuestion> questions) {
-
-        quizQuestionList = questions;
+        if(questions == null || questions.size() <= 0) {
+            Toast.makeText(WeekView.this, "No questions found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(quizQuestionList.size() <= 0){
+        //    first time loading
+            quizQuestionList = questions;
+        }
+        else{
+            quizQuestionList.clear();
+            quizQuestionList.addAll(questions);
+        }
         adapter = new QuestionAdapter(quizQuestionList);
-        adapter.notifyDataSetChanged();
+        quizQuestionList = questions;
+        recyclerView.setAdapter(adapter);
         //click listener
         adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
             @Override
@@ -131,7 +87,6 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
         });
 
 
-        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -160,8 +115,9 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             //invalidate the old RV if it is a different week
-            if(adapter != null && adapter.getWeekNum() != weekNum){
-                adapter.invalidateQuestions();
+            if(adapter != null && quizQuestionList != null){
+                questionFetcher.fetchQuestions(questionListener);
+                adapter.updateModel(quizQuestionList);
             }
             return true;
         }

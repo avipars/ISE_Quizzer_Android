@@ -1,6 +1,7 @@
 package com.aviparshan.isequiz.Controller.Questions;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +31,55 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
    private OnItemClickListener listener;
    private OnItemLongClickListener longListener;
 
+   private static int currentPos = 0;
+   private Context context;
+   public QuestionAdapter() {
+      this.quizQuestions = new ArrayList<>();
+   }
+
+   public QuestionAdapter(Context context) {
+      super();
+      this.context = context;
+      this.quizQuestions = new ArrayList<QuizQuestion>();
+   }
    public QuestionAdapter(List<QuizQuestion> q) {
+      super();
+
       this.quizQuestions = q;
       //this.filteredQuestions = quizQuestions;
    }
+
+   /**
+    * Define the listener interface
+    */
+    public void updateModel(List<QuizQuestion> newQ) {
+        this.quizQuestions.clear();
+        this.quizQuestions.addAll(newQ);
+        notifyDataSetChanged();
+        // //diff result
+        //DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+        //    @Override
+        //    public int getOldListSize() {
+        //        return quizQuestions.size();
+        //    }
+        //
+        //    @Override
+        //    public int getNewListSize() {
+        //        return newQ.size();
+        //    }
+        //
+        //    @Override
+        //    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        //        return quizQuestions.get(oldItemPosition).getQuestion().equals(newQ.get(newItemPosition).getQuestion());
+        //    }
+        //
+        //    @Override
+        //    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        //        return quizQuestions.get(oldItemPosition).equals(newQ.get(newItemPosition));
+        //    }
+        //});
+        //diffResult.dispatchUpdatesTo(this);
+    }
 
    @NonNull
    @Override
@@ -126,7 +172,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
       public void bindQuestion(QuizQuestion question) {
          questionTextView.setText(question.getQuestion());
          answerTextView.setText(question.getCorrectAnswer());
-         weekTextView.setText(String.valueOf(question.getWeekNum()));
+         weekTextView.setText("Week: " + question.getWeekNum());
       }
    }
 
