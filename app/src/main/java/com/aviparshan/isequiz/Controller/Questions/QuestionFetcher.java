@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
@@ -136,9 +135,6 @@ public class QuestionFetcher {
             String joined = String.join("", arr);
             List<String> blocks = Arrays.asList(joined.split("\\$")); // split on $ (question)
 
-
-            //List<String> text = new ArrayList<>(Arrays.asList(blocks)); // convert to list
-
             int index; //string index
             int qType;
             int qNum = 0;
@@ -245,100 +241,29 @@ public class QuestionFetcher {
         mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                sQuestions = parser(response);
 //                now parse the response
 //                Log.d(TAG, "Response" + response.toString());
                 Toast.makeText(mContext, "R0-100" + response.toString().substring(0, 100), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Response0-200" + response.toString().substring(0, 200));
-                sQuestions = parser(response);
+
 //                done = true;
 //now fill the adapter, notify the adapter, and set the adapter to the recycler view
 
 
                 //Toast.makeText(mContext, "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "Error :" + error.toString());
+        }, error -> {
+            Log.i(TAG, "Error :" + error.toString());
 
-                Toast.makeText(mContext, "Error :" + error.toString(), Toast.LENGTH_SHORT).show();
-                done = true;
-            }
+            Toast.makeText(mContext, "Error :" + error.toString(), Toast.LENGTH_SHORT).show();
+            done = true;
         });
 
         mRequestQueue.add(mStringRequest);
     //    .setShouldCache(true)
     }
 
-
-
-
-//    public static void fetchQuizQuestions(Context context, final FetchQuizQuestionsListener listener) {
-//        String quizzesJson = readQuizzesJsonFromAsset(context);
-//        if (quizzesJson == null) {
-//            listener.onFetchQuizQuestionsFailure();
-//            return;
-//        }
-//
-//        try {
-//            JSONObject quizzes = new JSONObject(quizzesJson);
-//            JSONArray quizArray = quizzes.getJSONArray("quizzes");
-//
-//            for (int i = 0; i < quizArray.length(); i++) {
-//                JSONObject quiz = quizArray.getJSONObject(i);
-//                String quizName = quiz.getString("name");
-//                String quizUrl = QUIZ_BASE_URL + quiz.getString("url");
-//
-//                List<QuizQuestion> questions = readQuestionsFromUrl(quizUrl);
-//                for (QuizQuestion question : questions) {
-//
-//                    question.setSubject(quizName);
-//                }
-//                sQuestions.addAll(questions);
-//            }
-//
-//            listener.onFetchQuizQuestionsSuccess(sQuestions);
-//        } catch (JSONException e) {
-//            Log.e(TAG, "Error parsing quizzes JSON", e);
-//            listener.onFetchQuizQuestionsFailure();
-//        }
-//    }
-
-    //private static String readQuizzesJsonFromAsset(Context context) {
-    //    String json = null;
-    //    try {
-    //        InputStream inputStream = context.getAssets().open("quizzes.json");
-    //        int size = inputStream.available();
-    //        byte[] buffer = new byte[size];
-    //        inputStream.read(buffer);
-    //        inputStream.close();
-    //        json = new String(buffer, StandardCharsets.UTF_8);
-    //    } catch (IOException e) {
-    //        Log.e(TAG, "Error reading quizzes JSON from asset", e);
-    //    }
-    //    return json;
-    //}
-
-//    private static List<QuizQuestion> readQuestionsFromUrl(String url) {
-//        List<QuizQuestion> questions = new ArrayList<>();
-//        try {
-//            InputStream inputStream = new URL(url).openStream();
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split("\\|");
-//                if (parts.length == 2) {
-//                    QuizQuestion question = new QuizQuestion(parts[0], parts[1]);
-//                    questions.add(question);
-//                }
-//            }
-//            reader.close();
-//            inputStream.close();
-//        } catch (IOException e) {
-//            Log.e(TAG, "Error reading quiz questions from URL", e);
-//        }
-//        return questions;
-//    }
 
     public interface FetchQuestionListener {
         void onFetchQuestionsSuccess(List<QuizQuestion> questions);
@@ -383,12 +308,13 @@ public class QuestionFetcher {
             if (questions != null && listener != null) {
                 listener.onFetchQuestionsSuccess(questions);
             } else if(listener != null){
+                //question null
                 listener.onFetchQuestionsFailure();
                 Log.e(TAG, "Listener is null");
             }
-            else{
-                Log.e(TAG, "Error reading quiz questions from URL");
-            }
+            sQuestions = questions;
+        //   send the data to the adapter
+
         }
     }
 }

@@ -116,7 +116,7 @@ QuestionFetcher.FetchQuestionListener questionListener = new QuestionFetcher.Fet
         if (id == R.id.action_settings) {
             //invalidate the old RV if it is a different week
             if(adapter != null && quizQuestionList != null){
-                questionFetcher.fetchQuestions(questionListener);
+                quizQuestionList = questionFetcher.getQuizzes();
                 adapter.updateModel(quizQuestionList);
             }
             return true;
