@@ -125,7 +125,7 @@ public class QuestionFetcher {
             i++;
         }
     }
-    public List<QuizQuestion> parser(String response) {
+    public static List<QuizQuestion> parser(String response) {
         List<QuizQuestion> sQuestions = new ArrayList<>(); // create an empty list of questions
         AsyncTask.execute(() -> {
             QuizQuestion q; // create a question object

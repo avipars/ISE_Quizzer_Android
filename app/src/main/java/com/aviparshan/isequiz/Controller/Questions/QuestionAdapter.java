@@ -49,36 +49,43 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
       //this.filteredQuestions = quizQuestions;
    }
 
+   public void addItems(List<QuizQuestion> dataList){
+      quizQuestions.addAll(dataList);
+
+   //   diff result to update the adapter
+      DiffUtil.DiffResult DiffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+         @Override
+         public int getOldListSize() {
+            return quizQuestions.size();
+         }
+
+         @Override
+         public int getNewListSize() {
+            return dataList.size();
+         }
+
+         @Override
+         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return quizQuestions.get(oldItemPosition).getQuestion().equals(dataList.get(newItemPosition).getQuestion());
+         }
+
+         @Override
+         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return quizQuestions.get(oldItemPosition).equals(dataList.get(newItemPosition));
+         }
+      });
+        DiffResult.dispatchUpdatesTo(this);
+
+
+   }
    /**
     * Define the listener interface
     */
     public void updateModel(List<QuizQuestion> newQ) {
         this.quizQuestions.clear();
         this.quizQuestions.addAll(newQ);
+        //notify that the whole list has changed
         notifyDataSetChanged();
-        // //diff result
-        //DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-        //    @Override
-        //    public int getOldListSize() {
-        //        return quizQuestions.size();
-        //    }
-        //
-        //    @Override
-        //    public int getNewListSize() {
-        //        return newQ.size();
-        //    }
-        //
-        //    @Override
-        //    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        //        return quizQuestions.get(oldItemPosition).getQuestion().equals(newQ.get(newItemPosition).getQuestion());
-        //    }
-        //
-        //    @Override
-        //    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        //        return quizQuestions.get(oldItemPosition).equals(newQ.get(newItemPosition));
-        //    }
-        //});
-        //diffResult.dispatchUpdatesTo(this);
     }
 
    @NonNull
