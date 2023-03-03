@@ -69,10 +69,51 @@ public class Main extends AppCompatActivity {
 
     public void passDataToNextActivity(Quiz quiz) {
         Intent intent = new Intent(this, WeekView.class);
-        intent.putExtra("quiz_url", quiz.getUrl());
-        intent.putExtra("quiz_week", quiz.getWeekNum());
-        intent.putExtra("quiz_subject", quiz.getSubject());
+        //intent.putExtra("quiz_url", quiz.getUrl());
+        //intent.putExtra("quiz_week", quiz.getWeekNum());
+        //intent.putExtra("quiz_subject", quiz.getSubject());
+        intent.putExtra("quiz", quiz);
+    //    StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
+    //
+    //        @Override
+    //        public void onResponse(String response) {
+    //            quizQuestionList = VolleySingleton.parser(response, quiz);
+    //            // wait until the parsing is done
+    //            if (QuestionFetcher.isIsFinishedParsing()) {
+    //                adapter.updateModel(quizQuestionList);
+    //            } else {
+    //                //try again in a few
+    //                while (!QuestionFetcher.isIsFinishedParsing()) {
+    //                    try {
+    //                        Thread.sleep(500);
+    //                    } catch (InterruptedException e) {
+    //                        if (BuildConfig.DEBUG) {
+    //                            Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
+    //                        } else {
+    //                            Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
+    //                        }
+    //
+    //                    }
+    //                }
+    //                adapter.updateModel(quizQuestionList);
+    //
+    //            }
+    //        }
+    //    }, error -> {
+    //        if (BuildConfig.DEBUG)
+    //            Log.e(TAG, "onErrorResponse: " + error.toString());
+    //        else
+    //            Toast.makeText(this, "Error with quiz request", Toast.LENGTH_SHORT).show();
+    //    });
+    //    mStringRequest.setTag(TAG);
+    //
+    //    mRequestQueue.add(mStringRequest).setShouldCache(true);
+    //
+    ////    prefetch the next quiz
+    //    VolleySingleton.getInstance(this).addToRequestQueue(stringReq);
+
         startActivity(intent);
+
     }
 
 //    got the list

@@ -56,10 +56,11 @@ public class WeekView extends AppCompatActivity {
 //        get the right week then fetch the questions (and answers) and cache them
 //        get the bundle from the intent
         Bundle bundle = getIntent().getExtras();
-        weekNum = bundle.getInt("quiz_week");
-        url = bundle.getString("quiz_url");
-        subject = bundle.getString("quiz_subject");
-        q = new Quiz(weekNum, subject, url);
+        //weekNum = bundle.getInt("quiz_week");
+        //url = bundle.getString("quiz_url");
+        //subject = bundle.getString("quiz_subject");
+        q = (Quiz) getIntent().getSerializableExtra("quiz");
+        //q = new Quiz(weekNum, subject, url);
         setTitle(q.getWeek());
         quizQuestionList = new ArrayList<>(); //new empty list
         setUp(q);
@@ -109,7 +110,7 @@ public class WeekView extends AppCompatActivity {
 
         // RequestQueue initialized
         //    get the quiz object then, fetch the questions from the url
-         mRequestQueue = Volley.newRequestQueue(this);
+        mRequestQueue = Volley.newRequestQueue(this);
         DiskBasedCache cache = new DiskBasedCache(getCacheDir(), 16 * 1024 * 1024);
         mRequestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
         mRequestQueue.start();

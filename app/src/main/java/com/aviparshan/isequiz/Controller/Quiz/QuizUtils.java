@@ -1,6 +1,8 @@
 package com.aviparshan.isequiz.Controller.Quiz;
 
 
+import java.util.List;
+
 /**
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz
@@ -27,4 +29,20 @@ public class QuizUtils {
         return charToString(c);
     }
 
+    /**
+     * get the question type given the possible answers list size
+     */
+    public static int getqType(List<String> possibleAnsEdited) {
+        int qType;
+        if (possibleAnsEdited.size() == 1) {
+            qType = QuizUtils.OPEN_ANSWER;
+        } else if (possibleAnsEdited.size() == 2) {
+            qType = QuizUtils.TRUE_FALSE;
+        } else if (possibleAnsEdited.size() > 2) {
+            qType = QuizUtils.MULTIPLE_CHOICE;
+        } else {
+            qType = QuizUtils.UNKNOWN;
+        }
+        return qType;
+    }
 }

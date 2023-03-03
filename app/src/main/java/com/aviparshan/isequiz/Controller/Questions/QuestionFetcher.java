@@ -3,7 +3,6 @@ package com.aviparshan.isequiz.Controller.Questions;
 
 import static com.aviparshan.isequiz.Controller.Quiz.QuizUtils.cToS;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
@@ -11,9 +10,6 @@ import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +31,7 @@ public class QuestionFetcher {
     private static boolean isFinishedParsing = false;
     //set the quiz
 
-    public QuestionFetcher(Context con, Quiz quiz) {
+    private QuestionFetcher(Context con, Quiz quiz) {
         this.mContext = con.getApplicationContext();
         q = quiz;
     }
@@ -75,8 +71,6 @@ public class QuestionFetcher {
     //    }
     //    return al.get(0).toString();
     //}
-
-
 
 
 
@@ -158,7 +152,7 @@ public class QuestionFetcher {
                     }
                 }
 
-                qType = getqType(possibleAnsEdited);
+                qType = QuizUtils.getqType(possibleAnsEdited);
                 quizQ = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
                 sQuestions.add(quizQ);
                 ++qNum;
@@ -171,20 +165,5 @@ public class QuestionFetcher {
         return isFinishedParsing;
     }
 
-    /**
-     * get the question type given the possible answers list size
-     */
-    private static int getqType(List<String> possibleAnsEdited) {
-        int qType;
-        if (possibleAnsEdited.size() == 1) {
-            qType = QuizUtils.OPEN_ANSWER;
-        } else if (possibleAnsEdited.size() == 2) {
-            qType = QuizUtils.TRUE_FALSE;
-        } else if (possibleAnsEdited.size() > 2) {
-            qType = QuizUtils.MULTIPLE_CHOICE;
-        } else {
-            qType = QuizUtils.UNKNOWN;
-        }
-        return qType;
-    }
+
 }
