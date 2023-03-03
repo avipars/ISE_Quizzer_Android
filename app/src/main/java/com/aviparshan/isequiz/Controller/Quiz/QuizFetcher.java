@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Models.Quiz;
 
 import org.json.JSONArray;
@@ -66,7 +68,12 @@ public class QuizFetcher {
                 mListener.onQuizzesFetched(mQuizzes);
             }
             else{
-                Log.e(TAG, "Error fetching quizzes");
+                if(BuildConfig.DEBUG) {
+                    Log.e(TAG, "Error fetching quizzes");
+                }
+                else{
+                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
+                }
             }
 
         }
@@ -105,7 +112,12 @@ public class QuizFetcher {
             //    now save the quizzes to the database
 
             } catch (IOException | JSONException e) {
-                Log.e(TAG, "Error fetching quizzes", e);
+                if(BuildConfig.DEBUG){
+                    Log.e(TAG, "Error fetching quizzes", e);
+                }
+                else{
+                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
+                }
                 if (mListener != null) {
                     mListener.onFetchError(e);
                 }
@@ -123,4 +135,3 @@ public class QuizFetcher {
     }
 
 }
-

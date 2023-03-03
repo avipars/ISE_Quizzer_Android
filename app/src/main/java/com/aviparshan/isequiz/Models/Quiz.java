@@ -1,6 +1,8 @@
 package com.aviparshan.isequiz.Models;
 
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 /**
@@ -9,15 +11,13 @@ import java.io.Serializable;
  */
 public class Quiz implements Serializable {
 
-    int weekNum;
-    String subject;
-    String url;
+    private String subject;
+    private String url;
 
+    private String week;
+    private int weekNum;
 
     public static double version = -2.0;
-
-    String week;
-
 
     public String getUrl() {
         return url;
@@ -79,5 +79,16 @@ public class Quiz implements Serializable {
         result = 31 * result + (getUrl() != null ? getUrl().hashCode() : 0);
         result = 31 * result + (getWeek() != null ? getWeek().hashCode() : 0);
         return result;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Quiz" +
+                "weekNum=" + weekNum +
+                ", subject='" + subject + '\'' +
+                ", url='" + url + '\'' +
+                ", week='" + week + '\'' +
+                '}';
     }
 }

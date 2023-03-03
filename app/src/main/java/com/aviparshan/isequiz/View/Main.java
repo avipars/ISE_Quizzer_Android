@@ -1,15 +1,21 @@
 package com.aviparshan.isequiz.View;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Quiz.QuizAdapter;
 import com.aviparshan.isequiz.Controller.Quiz.QuizFetcher;
 import com.aviparshan.isequiz.Models.Quiz;
@@ -20,22 +26,26 @@ import java.util.List;
 public class Main extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private QuizAdapter qa;
     private List<Quiz> quizzes;
-    private QuizFetcher quizFetcher;
+    private static final String TAG = Main.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.recycler_view);
         recyclerView = findViewById(R.id.rvList);
-        quizFetcher = QuizFetcher.getInstance(this);
+        QuizFetcher quizFetcher = QuizFetcher.getInstance(this);
 
         quizFetcher.fetchQuizzes(quizFetcherListener);
         // Set the layout manager of the RecyclerView to a LinearLayoutManager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(Main.this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
+        layoutManager.scrollToPosition(0);
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
+
     }
 
     QuizFetcher.OnQuizzesFetchedListener quizFetcherListener = new QuizFetcher.OnQuizzesFetchedListener() {
@@ -48,7 +58,12 @@ public class Main extends AppCompatActivity {
         @Override
         public void onFetchError(Exception e) {
             // Handle the quiz fetch error here
-            Toast.makeText(Main.this, "Error: "+ e.toString(), Toast.LENGTH_SHORT).show();
+            if(BuildConfig.DEBUG){
+                Log.e(TAG, "onFetchError", e);
+            }
+            else{
+                Toast.makeText(Main.this, "Error Fetching Quizzes", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -64,15 +79,20 @@ public class Main extends AppCompatActivity {
     void onFetchSuccess(List<Quiz> q){
         quizzes = q;
         // Create an instance of the QuizAdapter class, passing in the quiz list
-        qa = new QuizAdapter(quizzes);
+        QuizAdapter qa = new QuizAdapter(quizzes);
         qa.setOnItemClickListener(((itemView, position) -> {
             Quiz quiz = quizzes.get(position);
-            Toast.makeText(this, "Clicked: " + quiz.getSubject(), Toast.LENGTH_SHORT).show();
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+// Create a ClipData object to store the text
+            ClipData clip = ClipData.newPlainText("label", quiz.getSubject());
+// Copy the text to the clipboard
+            clipboard.setPrimaryClip(clip);
+
+            Toast.makeText(this, "Copied: " + quiz.getSubject(), Toast.LENGTH_SHORT).show();
         }));
         qa.setOnItemLongClickListener(((itemView, position) -> {
             Quiz quiz = quizzes.get(position);
             passDataToNextActivity(quiz);
-//            Toast.makeText(this, "LongClick: " + quiz.getWeekNum(), Toast.LENGTH_SHORT).show();
         }));
 
 
@@ -97,19 +117,9 @@ public class Main extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(this, "V" + Quiz.version, Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(this, "Version: " + Quiz.version, Toast.LENGTH_SHORT).show();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-
-//    @Override
-//    public boolean onSupportNavigateUp() {
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-//        return NavigationUI.navigateUp(navController, appBarConfiguration)
-//                || super.onSupportNavigateUp();
-//    }
 }

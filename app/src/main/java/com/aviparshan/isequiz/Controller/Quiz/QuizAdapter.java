@@ -63,7 +63,6 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         Quiz q = quizzes.get(position);
         holder.weekTV.setText(q.getWeek());
         holder.subjectTV.setText(q.getSubject());
-//        holder.urlTV.setText(q.getUrl());
     }
 
 
@@ -82,19 +81,10 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
             super(itemView);
             weekTV = itemView.findViewById(R.id.weekTextView);
             subjectTV = itemView.findViewById(R.id.subjectTextView);
-//            urlTV = itemView.findViewById(R.id.urlTextView);
-
             itemView.setOnClickListener(onClickListener);
             itemView.setOnLongClickListener(longClickListener);
-//            weekTV.setOnClickListener(weekL);
         }
 
-//        View.OnClickListener weekL = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(weekTV.getContext(), "dd", Toast.LENGTH_SHORT).show();
-//            }
-//        };
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

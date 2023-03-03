@@ -15,7 +15,6 @@ import java.util.List;
 public class QuizQuestion implements Serializable {
 
     private String question;
-
     private int qType; //fromQuizUtils
     private int weekNum;
 //    static variable for week number
@@ -24,6 +23,7 @@ public class QuizQuestion implements Serializable {
     private int correctAnswerIndex; //index to the right element in the possible answers list
     private int id = 0;
 
+    private boolean showAnswer = false;
     private List<String> possibleAnswers;
     public void setId(int id) {
         this.id = id;
@@ -67,21 +67,6 @@ public class QuizQuestion implements Serializable {
         this.correctAnswerIndex = correctAnswerNumber;
         this.id = id;
         this.possibleAnswers = possibleAnswers;
-    }
-
-//    OPEN ANSWER
-    public QuizQuestion(String quest, String correctAns){
-        this.question = quest;
-        this.correctAnswer = correctAns;
-        setqType(QuizUtils.OPEN_ANSWER);
-
-    }
-
-//    TRUE FALSE
-    public QuizQuestion(String q, String ca, int type){
-        question = q;
-        correctAnswer = ca;
-        setqType(type);
     }
 
 
@@ -169,5 +154,13 @@ public class QuizQuestion implements Serializable {
         result = 31 * result + getId();
         result = 31 * result + (getPossibleAnswers() != null ? getPossibleAnswers().hashCode() : 0);
         return result;
+    }
+
+    public void setShowAnswer(boolean showAnswer) {
+        this.showAnswer = showAnswer;
+    }
+
+    public boolean getShowAnswer() {
+        return showAnswer;
     }
 }
