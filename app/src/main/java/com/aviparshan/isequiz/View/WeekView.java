@@ -23,7 +23,6 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Questions.QuestionAdapter;
 import com.aviparshan.isequiz.Controller.Questions.QuestionFetcher;
@@ -39,15 +38,11 @@ import java.util.List;
  * Created by Avi Parshan on 2/25/2023 on com.aviparshan.isequiz.View
  */
 public class WeekView extends AppCompatActivity {
-    private RecyclerView recyclerView;
     private QuestionAdapter adapter;
-    private int weekNum;
-    private String url, subject;
-    private Quiz q;
-    private List<QuizQuestion> quizQuestionList;
+    private List<QuizQuestion> quizQuestionList = new ArrayList<>(); //new empty list
     private static final String TAG = WeekView.class.getSimpleName();
     private RequestQueue mRequestQueue;
-    private StringRequest mStringRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,14 +50,8 @@ public class WeekView extends AppCompatActivity {
 
 //        get the right week then fetch the questions (and answers) and cache them
 //        get the bundle from the intent
-        Bundle bundle = getIntent().getExtras();
-        //weekNum = bundle.getInt("quiz_week");
-        //url = bundle.getString("quiz_url");
-        //subject = bundle.getString("quiz_subject");
-        q = (Quiz) getIntent().getSerializableExtra("quiz");
-        //q = new Quiz(weekNum, subject, url);
+        Quiz q = (Quiz) getIntent().getSerializableExtra("quiz");
         setTitle(q.getWeek());
-        quizQuestionList = new ArrayList<>(); //new empty list
         setUp(q);
 
     //    listeners for clicks
@@ -90,7 +79,7 @@ public class WeekView extends AppCompatActivity {
     }
 
     private void setUp(Quiz q) {
-        recyclerView = findViewById(R.id.rvList);
+        RecyclerView recyclerView = findViewById(R.id.rvList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(WeekView.this);
         recyclerView.setLayoutManager(layoutManager);
         //    set the adapter
@@ -101,8 +90,6 @@ public class WeekView extends AppCompatActivity {
         layoutManager.scrollToPosition(0);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
-
-
     }
 
 
@@ -110,14 +97,20 @@ public class WeekView extends AppCompatActivity {
 
         // RequestQueue initialized
         //    get the quiz object then, fetch the questions from the url
-        mRequestQueue = Volley.newRequestQueue(this);
-        DiskBasedCache cache = new DiskBasedCache(getCacheDir(), 16 * 1024 * 1024);
-        mRequestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
-        mRequestQueue.start();
         //tag the request
+        //mRequestQueue = Volley.newRequestQueue(this,);
+        // Instantiate the cache
+        DiskBasedCache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024);
+        // Set up the network to use HttpURLConnection as the HTTP client.
+        mRequestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
+        // Start the queue
+        mRequestQueue.start();
+
 
         //now fill the adapter, notify the adapter, and set the adapter to the recycler view
-        mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
+        // wait until the parsing is done
+        //try again in a few
+        StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -136,11 +129,9 @@ public class WeekView extends AppCompatActivity {
                             } else {
                                 Toast.makeText(WeekView.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     }
                     adapter.updateModel(quizQuestionList);
-
                 }
             }
         }, error -> {
@@ -151,7 +142,12 @@ public class WeekView extends AppCompatActivity {
         });
         mStringRequest.setTag(TAG);
 
+        // Instantiate the cache
+        //DiskBasedCache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024);
+        //mRequestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
         mRequestQueue.add(mStringRequest).setShouldCache(true);
+        //VolleySingleton.getInstance(this).addToRequestQueue(mStringRequest, TAG);
+
     }
 
     @Override
@@ -193,27 +189,4 @@ public class WeekView extends AppCompatActivity {
             mRequestQueue.cancelAll(TAG);
         }
     }
-
-    //
-    //public JSONObject getVolleyCacheEntryByUrl(Activity c,
-    //                                           String relative_url) {
-    //    // RequestQueue queue = Volley.newRequestQueue(c);
-    //    String cachedResponse = new String(AppController
-    //            .getInstance()
-    //            .getRequestQueue()
-    //            .getCache()
-    //            .get(c.getResources().getString(R.string.base_url)
-    //                    + relative_url).data);
-    //
-    //    try {
-    //        JSONObject cacheObj = new JSONObject(cachedResponse);
-    //        Log.e("CacheResult", cacheObj.toString());
-    //        return cacheObj;
-    //
-    //    } catch (JSONException e) {
-    //        e.printStackTrace();
-    //        return null;
-    //    }
-    //
-    //}
 }

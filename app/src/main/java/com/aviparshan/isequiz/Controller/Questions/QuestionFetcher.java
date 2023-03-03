@@ -47,32 +47,6 @@ public class QuestionFetcher {
         return sQuestions;
     }
 
-    //private String getTextFromUrl(String link) {
-    //
-    //    ArrayList<String> al = new ArrayList<>();
-    //
-    //    try {
-    //        URL url = new URL(link);
-    //        URLConnection conn = url.openConnection();
-    //        conn.setDoOutput(true);
-    //        conn.connect();
-    //
-    //        InputStream is = conn.getInputStream();
-    //        InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-    //
-    //        try (BufferedReader br = new BufferedReader(isr)) {
-    //            String line;
-    //            while ((line = br.readLine()) != null) {
-    //                al.add(line);
-    //            }
-    //        }
-    //    } catch (IOException e) {
-    //        e.printStackTrace();
-    //    }
-    //    return al.get(0).toString();
-    //}
-
-
 
     /**
      * Parse the response from the server and form into list of question objects
@@ -157,7 +131,8 @@ public class QuestionFetcher {
                 sQuestions.add(quizQ);
                 ++qNum;
             }
-        isFinishedParsing = true;
+        isFinishedParsing = true; //set the parsing to finished
+
         return sQuestions;
     }
 
@@ -165,5 +140,7 @@ public class QuestionFetcher {
         return isFinishedParsing;
     }
 
-
+    public static void setIsFinishedParsing(boolean is) {
+        isFinishedParsing = is;
+    }
 }

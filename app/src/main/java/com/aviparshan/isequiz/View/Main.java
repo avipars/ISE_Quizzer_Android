@@ -28,7 +28,6 @@ public class Main extends AppCompatActivity {
     private RecyclerView recyclerView;
     private List<Quiz> quizzes;
     private static final String TAG = Main.class.getSimpleName();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +68,70 @@ public class Main extends AppCompatActivity {
 
     public void passDataToNextActivity(Quiz quiz) {
         Intent intent = new Intent(this, WeekView.class);
-        //intent.putExtra("quiz_url", quiz.getUrl());
-        //intent.putExtra("quiz_week", quiz.getWeekNum());
-        //intent.putExtra("quiz_subject", quiz.getSubject());
         intent.putExtra("quiz", quiz);
+        startActivity(intent);
+        //StringRequest stringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
+        //    @Override
+        //    public void onResponse(String response) {
+        //        //send the list to the next activity
+        //        //put a custom object in the intent
+        //        QuestionFetcher.getInstance(Main.this, quiz);
+        //
+        //        quizQuestionList = QuestionFetcher.parser(response, quiz);
+        //        if(!QuestionFetcher.isIsFinishedParsing()){
+        //            while(!QuestionFetcher.isIsFinishedParsing()){
+        //                try {
+        //                    Thread.sleep(500);
+        //                } catch (InterruptedException e) {
+        //                    if(BuildConfig.DEBUG){
+        //                        Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
+        //                    }
+        //                    else{
+        //                        Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        //intent.putExtra("quizQuestionList", (java.io.Serializable) quizQuestionList);
+        //        startActivity(intent);
+        //
+        //    }
+        //},  error ->{
+        //        if (BuildConfig.DEBUG)
+        //            Log.e(TAG, "onErrorResponse: " + error.toString());
+        //        else
+        //            Toast.makeText(this, "Error with quiz request", Toast.LENGTH_SHORT).show();
+        //
+        //});
+
+
+
+        //{
+        //    @Override
+        //    public void onResponse(String response){
+        //        quizQuestionList = VolleySingleton.parser(response, quiz);
+        //        // wait until the parsing is done
+        //        if (QuestionFetcher.isIsFinishedParsing()) {
+        //            adapter.updateModel(quizQuestionList);
+        //            startActivity(intent);
+        //
+        //        } else {
+        //            //try again in a few
+        //            while (!QuestionFetcher.isIsFinishedParsing()) {
+        //                try {
+        //                    Thread.sleep(500);
+        //                } catch (InterruptedException e) {
+        //                    if (BuildConfig.DEBUG) {
+        //                        Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
+        //                    } else {
+        //                        Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
+        //                    }
+        //                }
+        //            }
+        //            adapter.updateModel(quizQuestionList);
+        //        }
+        //    }
+        //}
     //    StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
     //
     //        @Override
@@ -109,10 +168,10 @@ public class Main extends AppCompatActivity {
     //
     //    mRequestQueue.add(mStringRequest).setShouldCache(true);
     //
-    ////    prefetch the next quiz
-    //    VolleySingleton.getInstance(this).addToRequestQueue(stringReq);
+    //    prefetch the next quiz
+    //   VolleySingleton.getInstance(this).addToRequestQueue(stringRequest, TAG);
 
-        startActivity(intent);
+
 
     }
 
