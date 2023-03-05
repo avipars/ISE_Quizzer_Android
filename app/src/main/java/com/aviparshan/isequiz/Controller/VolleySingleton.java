@@ -3,12 +3,12 @@ package com.aviparshan.isequiz.Controller;
 
 import android.content.Context;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
-import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
 
 /**
  * ISE Quiz
@@ -16,10 +16,12 @@ import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
  */
 public class VolleySingleton {
 
+
     private static VolleySingleton instance;
     private RequestQueue requestQueue;
     private static Context ctx;
     private static final String TAG = VolleySingleton.class.getSimpleName();
+    private boolean isRunning = false;
 
     private VolleySingleton(Context context) {
         ctx = context;
@@ -33,24 +35,48 @@ public class VolleySingleton {
         return instance;
     }
 
+    public void startRequestQueue() {
+        requestQueue.start();
+        isRunning = true;
+    }
+
+    public void stopRequestQueue() {
+        requestQueue.stop();
+        isRunning = false;
+    }
+
+    public void toggleRequestQueue() {
+        if (isRunning) {
+            stopRequestQueue();
+        } else {
+            startRequestQueue();
+        }
+    }
+
+    public boolean isRequestQueueRunning() {
+        return isRunning;
+    }
+
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the
             // Activity or BroadcastReceiver if someone passes one in.
+            isRunning = false;
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
-            DiskBasedCache cache = new DiskBasedCache(ctx.getCacheDir(), 16 * 1024 * 1024);
+            DiskBasedCache cache = new DiskBasedCache(ctx.getCacheDir(), 16 * 1024 * 1024); // 16MB cap
             requestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
         }
+
         return requestQueue;
     }
 
     //    add request to queue with tag
-    public <T> void addToRequestQueue(com.android.volley.Request<T> req, String tag) {
+    public <T> void addToRequestQueue(Request<T> req, String tag) {
         getRequestQueue().add(req).setTag(tag).setShouldCache(true);
     }
 
     //    add request to queue
-    public <T> void addToRequestQueue(com.android.volley.Request<T> req) {
+    public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req).setShouldCache(true);
     }
 
@@ -58,11 +84,12 @@ public class VolleySingleton {
     public void cancelAllRequests() {
         requestQueue.cancelAll(new RequestQueue.RequestFilter() {
             @Override
-            public boolean apply(com.android.volley.Request<?> request) {
+            public boolean apply(Request<?> request) {
                 return true;
             }
         });
     }
+
 
 
     //    cancel request based on tag
@@ -70,12 +97,25 @@ public class VolleySingleton {
         requestQueue.cancelAll(tag);
     }
 
-    public static boolean isIsFinishedParsing() {
-        return QuestionParser.isIsFinishedParsing();
+    //function to see if cache is empty for a given url
+    public boolean isCacheEmpty(String url) {
+        return requestQueue.getCache().get(url) == null;
     }
 
-    public static void setIsFinishedParsing(boolean is) {
-        QuestionParser.setIsFinishedParsing(is);
+//    clear cache
+    public void clearCache() {
+        requestQueue.getCache().clear();
     }
+
+//    remove cache item by url
+    public void removeCacheItem(String url) {
+        requestQueue.getCache().remove(url);
+    }
+
+//    invalidate cache item by url
+    public void invalidateCacheItem(String url) {
+        requestQueue.getCache().invalidate(url, true);
+    }
+
 
 }

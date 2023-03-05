@@ -19,7 +19,7 @@ public class QuizQuestion implements Serializable {
     private int weekNum;
     private String correctAnswer;
     private int correctAnswerIndex; //index to the right element in the possible answers list
-    private int id = 0;
+    private int id;
 
     private boolean showAnswer = false;
     private List<String> possibleAnswers;
@@ -59,10 +59,9 @@ public class QuizQuestion implements Serializable {
 //   set the static week number
 
     public void setWeekNum(int weekNum) { //only have 12 weeks worth of questions
-        if(weekNum >= 0 && weekNum <= 12){
+        if (weekNum >= 0 && weekNum <= 12) {
             this.weekNum = weekNum;
-        }
-        else{
+        } else {
             this.weekNum = -1;
         }
     }
@@ -87,16 +86,16 @@ public class QuizQuestion implements Serializable {
         return id;
     }
 
-    public void setShowAnswer(boolean showAnswer) {
-        this.showAnswer = showAnswer;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean getShowAnswer() {
         return showAnswer;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setShowAnswer(boolean showAnswer) {
+        this.showAnswer = showAnswer;
     }
 
     public int getqType() {
@@ -104,10 +103,9 @@ public class QuizQuestion implements Serializable {
     }
 
     public void setqType(int type) {
-        if(type != Utils.OPEN_ANSWER && type != Utils.TRUE_FALSE && type != Utils.MULTIPLE_CHOICE){
+        if (type != Utils.OPEN_ANSWER && type != Utils.TRUE_FALSE && type != Utils.MULTIPLE_CHOICE) {
             qType = Utils.UNKNOWN;
-        }
-        else {
+        } else {
             qType = type;
         }
     }
@@ -120,9 +118,16 @@ public class QuizQuestion implements Serializable {
         this.possibleAnswers = possibleAnswers;
     }
 
-    @NonNull
-    public String toString(){
-        return "Question: " + question + " Week: " + weekNum + " Correct Answer: " + correctAnswer + " Correct Answer Number: " + correctAnswerIndex + " ID: " + id;
+    @Override
+    public int hashCode() {
+        int result = getQuestion().hashCode();
+        result = 31 * result + getqType();
+        result = 31 * result + getWeekNum();
+        result = 31 * result + getCorrectAnswer().hashCode();
+        result = 31 * result + getCorrectAnswerNumber();
+        result = 31 * result + getId();
+        result = 31 * result + (getPossibleAnswers() != null ? getPossibleAnswers().hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -141,16 +146,9 @@ public class QuizQuestion implements Serializable {
         return getPossibleAnswers() != null ? getPossibleAnswers().equals(that.getPossibleAnswers()) : that.getPossibleAnswers() == null;
     }
 
-    @Override
-    public int hashCode() {
-        int result = getQuestion().hashCode();
-        result = 31 * result + getqType();
-        result = 31 * result + getWeekNum();
-        result = 31 * result + getCorrectAnswer().hashCode();
-        result = 31 * result + getCorrectAnswerNumber();
-        result = 31 * result + getId();
-        result = 31 * result + (getPossibleAnswers() != null ? getPossibleAnswers().hashCode() : 0);
-        return result;
+    @NonNull
+    public String toString() {
+        return "Question: " + question + " Week: " + weekNum + " Correct Answer: " + correctAnswer + " Correct Answer Number: " + correctAnswerIndex + " ID: " + id;
     }
 
 

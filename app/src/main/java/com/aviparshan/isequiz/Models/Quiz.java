@@ -11,20 +11,16 @@ import java.io.Serializable;
  */
 public class Quiz implements Serializable {
 
+    public static double version = -2.0;
     private String subject;
     private String url;
-
     private String week;
     private int weekNum;
 
-    public static double version = -2.0;
-
 
     public Quiz(int num, String subject, String url) {
-//        this.weekNum = num;
         this.subject = subject;
         this.url = url;
-//        this.week = String.format("Week %s", num);
         setWeekNum(num);
     }
 
@@ -42,11 +38,10 @@ public class Quiz implements Serializable {
     }
 
     public void setWeekNum(int num) {
-        if(num >= 0 && num <= 13) {
+        if (num >= 0 && num <= 13) {
             this.weekNum = num;
             this.week = String.format("Week %s", num);
-        }
-        else {
+        } else {
             //not valid week
             this.weekNum = -1;
             this.week = "Week -1";
@@ -66,6 +61,15 @@ public class Quiz implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        int result = getWeekNum();
+        result = 31 * result + (getSubject() != null ? getSubject().hashCode() : 0);
+        result = 31 * result + (getUrl() != null ? getUrl().hashCode() : 0);
+        result = 31 * result + (getWeek() != null ? getWeek().hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Quiz)) return false;
@@ -80,23 +84,9 @@ public class Quiz implements Serializable {
         return getWeek() != null ? getWeek().equals(quiz.getWeek()) : quiz.getWeek() == null;
     }
 
-    @Override
-    public int hashCode() {
-        int result = getWeekNum();
-        result = 31 * result + (getSubject() != null ? getSubject().hashCode() : 0);
-        result = 31 * result + (getUrl() != null ? getUrl().hashCode() : 0);
-        result = 31 * result + (getWeek() != null ? getWeek().hashCode() : 0);
-        return result;
-    }
-
     @NonNull
     @Override
     public String toString() {
-        return "Quiz" +
-                "weekNum=" + weekNum +
-                ", subject='" + subject + '\'' +
-                ", url='" + url + '\'' +
-                ", week='" + week + '\'' +
-                '}';
+        return "Quiz" + "weekNum=" + weekNum + ", subject='" + subject + '\'' + ", url='" + url + '\'' + ", week='" + week + '\'' + '}';
     }
 }

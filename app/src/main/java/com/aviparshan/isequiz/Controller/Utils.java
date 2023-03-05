@@ -1,6 +1,10 @@
 package com.aviparshan.isequiz.Controller;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.List;
 
 /**
@@ -44,5 +48,11 @@ public class Utils {
             qType = Utils.UNKNOWN;
         }
         return qType;
+    }
+
+    public static boolean isConnectedToInternet(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

@@ -28,9 +28,8 @@ import java.util.List;
 
 public class QuizFetcher {
     private static final String TAG = QuizFetcher.class.getSimpleName();
-    private static QuizFetcher sQuizFetcher;
     private static final String QUIZZES_URL = "quizzes.json";
-
+    private static QuizFetcher sQuizFetcher;
     private final Context mContext;
     private List<Quiz> mQuizzes;
 
@@ -54,28 +53,18 @@ public class QuizFetcher {
         new FetchQuizzesTask(listener).execute();
     }
 
+    public interface OnQuizzesFetchedListener {
+        void onQuizzesFetched(List<Quiz> quiz);
+
+        void onFetchError(Exception error);
+
+    }
+
     private class FetchQuizzesTask extends AsyncTask<Void, Void, List<Quiz>> {
         private final OnQuizzesFetchedListener mListener;
 
         public FetchQuizzesTask(OnQuizzesFetchedListener listener) {
             mListener = listener;
-        }
-
-        @Override
-        protected void onPostExecute(List<Quiz> quizzes) {
-            mQuizzes = quizzes;
-            if (mListener != null && mQuizzes != null) {
-                mListener.onQuizzesFetched(mQuizzes);
-            }
-            else{
-                if(BuildConfig.DEBUG) {
-                    Log.e(TAG, "Error fetching quizzes");
-                }
-                else{
-                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
-                }
-            }
-
         }
 
         @Override
@@ -109,13 +98,12 @@ public class QuizFetcher {
                     quizzes.add(quiz);
                 }
 
-            //    now save the quizzes to the database
+                //    now save the quizzes to the database
 
             } catch (IOException | JSONException e) {
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     Log.e(TAG, "Error fetching quizzes", e);
-                }
-                else{
+                } else {
                     Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
                 }
                 if (mListener != null) {
@@ -125,13 +113,21 @@ public class QuizFetcher {
 
             return quizzes;
         }
-    }
 
-    public interface OnQuizzesFetchedListener {
-        void onQuizzesFetched(List<Quiz> quiz);
+        @Override
+        protected void onPostExecute(List<Quiz> quizzes) {
+            mQuizzes = quizzes;
+            if (mListener != null && mQuizzes != null) {
+                mListener.onQuizzesFetched(mQuizzes);
+            } else {
+                if (BuildConfig.DEBUG) {
+                    Log.e(TAG, "Error fetching quizzes");
+                } else {
+                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        void onFetchError(Exception error);
-
+        }
     }
 
 }

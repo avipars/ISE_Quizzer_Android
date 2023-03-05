@@ -15,4 +15,10 @@
         android:orderInCategory="101"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_cache"
+        android:orderInCategory="102"
+        android:title="@string/refresh_cache_for_all_weeks"
+        app:showAsAction="never" />
 </menu>

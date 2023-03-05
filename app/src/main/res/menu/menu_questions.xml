@@ -13,13 +13,13 @@
 
     <item
         android:id="@+id/action_retry"
-        android:orderInCategory="102"
-        android:title="@string/retry_download"
+        android:orderInCategory="101"
+        android:title="@string/clear_cache"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_toggle_answers"
-        android:orderInCategory="103"
+        android:orderInCategory="102"
         android:title="@string/toggle_answers"
         android:checkable="true"
         app:actionViewClass="android.widget.CheckBox"

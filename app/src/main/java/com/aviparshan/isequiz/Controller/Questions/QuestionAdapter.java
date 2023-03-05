@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,35 +26,38 @@ import java.util.List;
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz.Controller
  */
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> implements Filterable {
 
-    private List<QuizQuestion> quizQuestions;
-    //private List<QuizQuestion> filteredQuestions;
+    private static final int currentPos = 0;
+    private List<QuizQuestion> quizQuestions, filteredQuestions;
+    //private List<QuizQuestion> ;
     private OnItemClickListener listener;
     private OnItemLongClickListener longListener;
 
-    private static int currentPos = 0;
-    private Context context;
-
     public QuestionAdapter() {
-        this.quizQuestions = new ArrayList<>();
+        quizQuestions = new ArrayList<>();
+        filteredQuestions = quizQuestions;
     }
 
     public QuestionAdapter(Context context) {
         super();
-        this.context = context;
-        this.quizQuestions = new ArrayList<QuizQuestion>();
+        quizQuestions = new ArrayList<>();
+        filteredQuestions = quizQuestions;
     }
 
     public QuestionAdapter(List<QuizQuestion> q) {
         super();
-        this.quizQuestions = q;
-        //this.filteredQuestions = quizQuestions;
+        quizQuestions = q;
+        filteredQuestions = q;
+    }
+
+    public List<QuizQuestion> getQuizQuestions() {
+        return filteredQuestions;
     }
 
     public void addItems(List<QuizQuestion> dataList) {
         quizQuestions.addAll(dataList);
-
+        filteredQuestions = quizQuestions;
         //   diff result to update the adapter
         DiffUtil.DiffResult DiffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
@@ -76,7 +81,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             }
         });
         DiffResult.dispatchUpdatesTo(this);
-    //    now update the list
+        //    now update the list
 
     }
 
@@ -86,9 +91,11 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     public void updateModel(List<QuizQuestion> newQ) {
         this.quizQuestions.clear(); //clear the old list
         this.quizQuestions.addAll(newQ); //add the new list
+        this.filteredQuestions = quizQuestions;
         //notify that the whole list has changed, so diffUtil doesn't really matter
         notifyDataSetChanged();
     }
+
 
     @NonNull
     @Override
@@ -115,13 +122,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 //            }
 //         }
 //      }
-        QuizQuestion question = quizQuestions.get(position);
+        QuizQuestion question = filteredQuestions.get(position);
         holder.bindQuestion(question);
     }
 
     @Override
     public int getItemCount() {
-        return quizQuestions.size();
+        return filteredQuestions.size();
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -133,91 +140,89 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         this.longListener = longListener;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(QuizQuestion question);
-    }
-
-    // Define interface for long click events
-    public interface OnItemLongClickListener {
-        void onItemLongClick(View itemView, int position);
-    }
-
-    public class QuestionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-
-        public TextView questionTextView;
-        public TextView answerTextView;
-        //public TextView weekTextView;
-
-        public QuestionViewHolder(@NonNull View itemView) {
-            super(itemView);
-            questionTextView = itemView.findViewById(R.id.questionTextView);
-            answerTextView = itemView.findViewById(R.id.answerTextView);
-            //weekTextView = itemView.findViewById(R.id.weekTextView);
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION && listener != null) {
-                QuizQuestion question = quizQuestions.get(position);
-                listener.onItemClick(question);
-            }
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            if (longListener != null) {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    longListener.onItemLongClick(itemView, position);
-                    return true;
+    @Override
+    public Filter getFilter() {
+    //    uses the filter method filter()
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if (charString.isEmpty()) {
+                    filteredQuestions = quizQuestions;
+                } else {
+                    List<QuizQuestion> filteredList = new ArrayList<>();
+                    for (QuizQuestion row : quizQuestions) {
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or phone number match
+                        if (row.getQuestion().toLowerCase().contains(charString.toLowerCase()) || row.getCorrectAnswer().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+                    filteredQuestions = filteredList;
                 }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filteredQuestions;
+                return filterResults;
             }
-            return false;
-        }
 
-        public void bindQuestion(QuizQuestion question) {
-            questionTextView.setText(question.getQuestion());
-            //weekTextView.setText("Week: " + question.gele tWeekNum());
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                //use DiffUtil to calculate the difference between the old and new list
+                DiffUtil.DiffResult DiffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() {
+                        return quizQuestions.size();
+                    }
 
-            answerTextView.setText(question.getCorrectAnswer());
-            if(question.getShowAnswer()){ //hide unless clicked
-                answerTextView.setVisibility(View.VISIBLE);
-            } else {
-                answerTextView.setVisibility(View.GONE);
+                    @Override
+                    public int getNewListSize() {
+                        return filteredQuestions.size();
+                    }
+
+                    @Override
+                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                        return quizQuestions.get(oldItemPosition).getQuestion().equals(filteredQuestions.get(newItemPosition).getQuestion());
+                    }
+
+                    @Override
+                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                        return quizQuestions.get(oldItemPosition).equals(filteredQuestions.get(newItemPosition));
+                    }
+                });
+                DiffResult.dispatchUpdatesTo(QuestionAdapter.this);
+                //now update the list
+                quizQuestions = filteredQuestions;
+
             }
-        }
+        };
     }
 
     public void setAllAnswers(boolean show) {
-        for (QuizQuestion q : quizQuestions) {
+        for (QuizQuestion q : filteredQuestions) {
             q.setShowAnswer(show);
-            notifyItemChanged(quizQuestions.indexOf(q));
+            notifyItemChanged(filteredQuestions.indexOf(q));
         }
     }
-
 
     //get the question at a specific position and set to toggle what is shown
     public void toggleAnswer(int position) {
         //if it was shown, hide it , else show it
-        quizQuestions.get(position).setShowAnswer(!quizQuestions.get(position).getShowAnswer());
+        filteredQuestions.get(position).setShowAnswer(!filteredQuestions.get(position).getShowAnswer());
         notifyItemChanged(position);
     }
 
     //getWeekNum
     public int getWeekNum() {
-        return quizQuestions.get(0).getWeekNum();
+        return filteredQuestions.get(0).getWeekNum();
     }
 
     //invalidate the list of questions
     public void invalidateQuestions() {
-        quizQuestions = null;
+        filteredQuestions = null;
         //notifyDataSetChanged();
         //   use DiffUtil to calculate the difference between the old and new list of questions
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, null));
-        quizQuestions = null;
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, null));
+        filteredQuestions = null;
         diffResult.dispatchUpdatesTo(this);
     }
 
@@ -227,51 +232,51 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         notifyItemInserted(position);
     }
 
-
     //update the list of questions
     public void updateQuestions(List<QuizQuestion> questions) {
         this.quizQuestions = questions;
         //    use DiffUtil to calculate the difference between the old and new list of questions
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, questions));
         quizQuestions = questions;
+        filteredQuestions = quizQuestions;
         diffResult.dispatchUpdatesTo(this);
     }
-
-    //public void filter(String query) {
-    //   List<QuizQuestion> newFilteredQuestions = new ArrayList<>();
-    //   for (QuizQuestion question : quizQuestions) {
-    //      if (question.getQuestion().toLowerCase().contains(query.toLowerCase())) {
-    //         newFilteredQuestions.add(question);
-    //      }
-    //   }
-    //   DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
-    //   filteredQuestions = newFilteredQuestions;
-    //   diffResult.dispatchUpdatesTo(this);
-    //}
-    //
-
-    //public void sort() {
-    //   quizQuestions.sort(new Comparator<QuizQuestion>() {
-    //      @Override
-    //      public int compare(QuizQuestion q1, QuizQuestion q2) {
-    //         return q1.getQuestion().compareTo(q2.getQuestion());
-    //      }
-    //   });
-    //   notifyDataSetChanged();
-    //}
 
     public void sort() {
         List<QuizQuestion> newFilteredQuestions = new ArrayList<>(quizQuestions);
         newFilteredQuestions.sort(new Comparator<QuizQuestion>() {
             @Override
             public int compare(QuizQuestion q1, QuizQuestion q2) {
-                return q1.getQuestion().compareTo(q2.getQuestion());
+                return q1.getQuestion().compareTo(q2.getQuestion() );
             }
         });
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, newFilteredQuestions));
         quizQuestions = newFilteredQuestions;
         diffResult.dispatchUpdatesTo(this);
     }
+
+    public interface OnItemClickListener {
+        void onItemClick(QuizQuestion question);
+    }
+
+
+    // Define interface for long click events
+    public interface OnItemLongClickListener {
+        void onItemLongClick(View itemView, int position);
+    }
+
+    public void filter(String query) {
+       List<QuizQuestion> newFilteredQuestions = new ArrayList<>();
+       for (QuizQuestion question : quizQuestions) {
+          if (question.getQuestion().toLowerCase().contains(query.toLowerCase()) || question.getCorrectAnswer().toLowerCase().contains(query.toLowerCase())) {
+             newFilteredQuestions.add(question);
+          }
+       }
+       DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(filteredQuestions, newFilteredQuestions));
+       filteredQuestions = newFilteredQuestions;
+       diffResult.dispatchUpdatesTo(this);
+    }
+
 
     private static class QuizDiffCallback extends DiffUtil.Callback {
 
@@ -302,8 +307,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             QuizQuestion oldQuestion = oldList.get(oldItemPosition);
             QuizQuestion newQuestion = newList.get(newItemPosition);
-            return oldQuestion.getQuestion().equals(newQuestion.getQuestion())
-                    && oldQuestion.getCorrectAnswer().equals(newQuestion.getCorrectAnswer());
+            return oldQuestion.getQuestion().equals(newQuestion.getQuestion()) && oldQuestion.getCorrectAnswer().equals(newQuestion.getCorrectAnswer());
         }
 
         @Nullable
@@ -322,6 +326,53 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 return null;
             }
             return payload;
+        }
+    }
+
+    public class QuestionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+        public TextView questionTextView;
+        public TextView answerTextView;
+        //public TextView weekTextView;
+
+        public QuestionViewHolder(@NonNull View itemView) {
+            super(itemView);
+            questionTextView = itemView.findViewById(R.id.questionTextView);
+            answerTextView = itemView.findViewById(R.id.answerTextView);
+            //weekTextView = itemView.findViewById(R.id.weekTextView);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION && listener != null) {
+                QuizQuestion question = filteredQuestions.get(position);
+                listener.onItemClick(question);
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION && longListener != null) {
+                longListener.onItemLongClick(itemView, position);
+                return true;
+            }
+            return false;
+        }
+
+        public void bindQuestion(QuizQuestion question) {
+            questionTextView.setText(question.getQuestion());
+            //weekTextView.setText("Week: " + question.gele tWeekNum());
+
+            answerTextView.setText(question.getCorrectAnswer());
+            if (question.getShowAnswer()) { //hide unless clicked
+                answerTextView.setVisibility(View.VISIBLE);
+            } else {
+                answerTextView.setVisibility(View.GONE);
+            }
         }
     }
 }

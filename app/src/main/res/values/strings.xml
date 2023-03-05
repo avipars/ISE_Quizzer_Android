@@ -1,16 +1,18 @@
 <resources>
     <string name="app_name">ISE Quiz</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="retry_download">Retry download</string>
-    <string name="search">Search...</string>
+
+    <string name="clear_cache">Clear Cache</string>
+    <string name="search">Search…</string>
     <string name="toggle_answers">Toggle Answers</string>
     <string name="copied">Answer copied to clipboard</string>
+    <string name="no_internet">No Internet Connection</string>
+    <string name="refresh_cache_for_all_weeks">Refresh Cache (for all weeks)</string>
+    <string name="error_fetch">Error Fetching Quizzes</string>
+    <string name="error_req">Error with quiz request</string>
+
 </resources>

@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Quiz.QuizAdapter;
 import com.aviparshan.isequiz.Controller.Quiz.QuizFetcher;
+import com.aviparshan.isequiz.Controller.Utils;
+import com.aviparshan.isequiz.Controller.VolleySingleton;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.R;
 
@@ -44,7 +46,6 @@ public class Main extends AppCompatActivity {
         layoutManager.scrollToPosition(0);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
-
     }
 
     QuizFetcher.OnQuizzesFetchedListener quizFetcherListener = new QuizFetcher.OnQuizzesFetchedListener() {
@@ -60,8 +61,8 @@ public class Main extends AppCompatActivity {
             if(BuildConfig.DEBUG){
                 Log.e(TAG, "onFetchError", e);
             }
-            else{
-                Toast.makeText(Main.this, "Error Fetching Quizzes", Toast.LENGTH_SHORT).show();
+            else {
+                Toast.makeText(Main.this, R.string.error_fetch, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -69,111 +70,21 @@ public class Main extends AppCompatActivity {
     public void passDataToNextActivity(Quiz quiz) {
         Intent intent = new Intent(this, WeekView.class);
         intent.putExtra("quiz", quiz);
+        //submit web request to get the quiz
+        //if connected to internet and cache is empty, prefetch the data
+        Context ctx = this.getApplicationContext();
+        if(Utils.isConnectedToInternet(ctx) && VolleySingleton.getInstance(ctx).isCacheEmpty(quiz.getUrl())){
+            WeekView.prefetcher(quiz, ctx);
+        }
+
+        if(!Utils.isConnectedToInternet(ctx))
+        {
+            Toast.makeText(this, R.string.no_internet, Toast.LENGTH_SHORT).show(); //send a toast to the user
+        }
         startActivity(intent);
-        //StringRequest stringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
-        //    @Override
-        //    public void onResponse(String response) {
-        //        //send the list to the next activity
-        //        //put a custom object in the intent
-        //        QuestionFetcher.getInstance(Main.this, quiz);
-        //
-        //        quizQuestionList = QuestionFetcher.parser(response, quiz);
-        //        if(!QuestionFetcher.isIsFinishedParsing()){
-        //            while(!QuestionFetcher.isIsFinishedParsing()){
-        //                try {
-        //                    Thread.sleep(500);
-        //                } catch (InterruptedException e) {
-        //                    if(BuildConfig.DEBUG){
-        //                        Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
-        //                    }
-        //                    else{
-        //                        Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        //intent.putExtra("quizQuestionList", (java.io.Serializable) quizQuestionList);
-        //        startActivity(intent);
-        //
-        //    }
-        //},  error ->{
-        //        if (BuildConfig.DEBUG)
-        //            Log.e(TAG, "onErrorResponse: " + error.toString());
-        //        else
-        //            Toast.makeText(this, "Error with quiz request", Toast.LENGTH_SHORT).show();
-        //
-        //});
-
-
-
-        //{
-        //    @Override
-        //    public void onResponse(String response){
-        //        quizQuestionList = VolleySingleton.parser(response, quiz);
-        //        // wait until the parsing is done
-        //        if (QuestionFetcher.isIsFinishedParsing()) {
-        //            adapter.updateModel(quizQuestionList);
-        //            startActivity(intent);
-        //
-        //        } else {
-        //            //try again in a few
-        //            while (!QuestionFetcher.isIsFinishedParsing()) {
-        //                try {
-        //                    Thread.sleep(500);
-        //                } catch (InterruptedException e) {
-        //                    if (BuildConfig.DEBUG) {
-        //                        Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
-        //                    } else {
-        //                        Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
-        //                    }
-        //                }
-        //            }
-        //            adapter.updateModel(quizQuestionList);
-        //        }
-        //    }
-        //}
-    //    StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
-    //
-    //        @Override
-    //        public void onResponse(String response) {
-    //            quizQuestionList = VolleySingleton.parser(response, quiz);
-    //            // wait until the parsing is done
-    //            if (QuestionFetcher.isIsFinishedParsing()) {
-    //                adapter.updateModel(quizQuestionList);
-    //            } else {
-    //                //try again in a few
-    //                while (!QuestionFetcher.isIsFinishedParsing()) {
-    //                    try {
-    //                        Thread.sleep(500);
-    //                    } catch (InterruptedException e) {
-    //                        if (BuildConfig.DEBUG) {
-    //                            Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
-    //                        } else {
-    //                            Toast.makeText(Main.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
-    //                        }
-    //
-    //                    }
-    //                }
-    //                adapter.updateModel(quizQuestionList);
-    //
-    //            }
-    //        }
-    //    }, error -> {
-    //        if (BuildConfig.DEBUG)
-    //            Log.e(TAG, "onErrorResponse: " + error.toString());
-    //        else
-    //            Toast.makeText(this, "Error with quiz request", Toast.LENGTH_SHORT).show();
-    //    });
-    //    mStringRequest.setTag(TAG);
-    //
-    //    mRequestQueue.add(mStringRequest).setShouldCache(true);
-    //
-    //    prefetch the next quiz
-    //   VolleySingleton.getInstance(this).addToRequestQueue(stringRequest, TAG);
-
-
-
     }
+
+
 
 //    got the list
     void onFetchSuccess(List<Quiz> q){
@@ -194,7 +105,6 @@ public class Main extends AppCompatActivity {
             Quiz quiz = quizzes.get(position);
             passDataToNextActivity(quiz);
         }));
-
 
         // Set the adapter of the RecyclerView to the QuizAdapter instance
         recyclerView.setAdapter(qa);
@@ -219,7 +129,11 @@ public class Main extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Toast.makeText(this, "Version: " + Quiz.version, Toast.LENGTH_SHORT).show();
             return true;
+        } else if(id == R.id.action_cache){
+            VolleySingleton.getInstance(this).clearCache();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }
