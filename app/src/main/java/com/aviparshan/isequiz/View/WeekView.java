@@ -25,7 +25,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Questions.QuestionAdapter;
-import com.aviparshan.isequiz.Controller.Questions.QuestionFetcher;
+import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
@@ -114,13 +114,13 @@ public class WeekView extends AppCompatActivity {
 
             @Override
             public void onResponse(String response) {
-                quizQuestionList = QuestionFetcher.parser(response, quiz);
+                quizQuestionList = QuestionParser.parser(response, quiz);
                 // wait until the parsing is done
-                if (QuestionFetcher.isIsFinishedParsing()) {
+                if (QuestionParser.isIsFinishedParsing()) {
                     adapter.updateModel(quizQuestionList);
                 } else {
                     //try again in a few
-                    while (!QuestionFetcher.isIsFinishedParsing()) {
+                    while (!QuestionParser.isIsFinishedParsing()) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -153,7 +153,7 @@ public class WeekView extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_questions, menu);
         return true;
     }
 

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.aviparshan.isequiz.View.Main">
+    tools:context="com.aviparshan.isequiz.View.WeekView">
     <item
         android:id="@+id/actionSearch"
         android:icon="@drawable/ic_search"
@@ -10,9 +10,18 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="101"
-        android:title="@string/action_settings"
+        android:id="@+id/action_retry"
+        android:orderInCategory="102"
+        android:title="@string/retry_download"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_answers"
+        android:orderInCategory="103"
+        android:title="@string/toggle_answers"
+        android:checkable="true"
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="never"/>
 </menu>

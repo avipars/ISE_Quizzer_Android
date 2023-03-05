@@ -86,7 +86,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     public void updateModel(List<QuizQuestion> newQ) {
         this.quizQuestions.clear(); //clear the old list
         this.quizQuestions.addAll(newQ); //add the new list
-        //notify that the whole list has changed
+        //notify that the whole list has changed, so diffUtil doesn't really matter
         notifyDataSetChanged();
     }
 
@@ -116,9 +116,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 //         }
 //      }
         QuizQuestion question = quizQuestions.get(position);
-//      holder.questionTextView.setText(question.getQuestion());
-//      holder.answerTextView.setText(question.getCorrectAnswer());
-//      holder.weekTextView.setText(question.getWeekNum());
         holder.bindQuestion(question);
     }
 
@@ -183,10 +180,10 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
         public void bindQuestion(QuizQuestion question) {
             questionTextView.setText(question.getQuestion());
-            //weekTextView.setText("Week: " + question.getWeekNum());
+            //weekTextView.setText("Week: " + question.gele tWeekNum());
 
             answerTextView.setText(question.getCorrectAnswer());
-            if(question.getShowAnswer()){
+            if(question.getShowAnswer()){ //hide unless clicked
                 answerTextView.setVisibility(View.VISIBLE);
             } else {
                 answerTextView.setVisibility(View.GONE);

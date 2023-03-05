@@ -1,4 +1,4 @@
-package com.aviparshan.isequiz.Controller.Quiz;
+package com.aviparshan.isequiz.Controller;
 
 
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.List;
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz
  */
-public class QuizUtils {
+public class Utils {
 
     public static final int TRUE_FALSE = 0;
     public static final int MULTIPLE_CHOICE = 1;
@@ -35,13 +35,13 @@ public class QuizUtils {
     public static int getqType(List<String> possibleAnsEdited) {
         int qType;
         if (possibleAnsEdited.size() == 1) {
-            qType = QuizUtils.OPEN_ANSWER;
+            qType = Utils.OPEN_ANSWER;
         } else if (possibleAnsEdited.size() == 2) {
-            qType = QuizUtils.TRUE_FALSE;
+            qType = Utils.TRUE_FALSE;
         } else if (possibleAnsEdited.size() > 2) {
-            qType = QuizUtils.MULTIPLE_CHOICE;
+            qType = Utils.MULTIPLE_CHOICE;
         } else {
-            qType = QuizUtils.UNKNOWN;
+            qType = Utils.UNKNOWN;
         }
         return qType;
     }

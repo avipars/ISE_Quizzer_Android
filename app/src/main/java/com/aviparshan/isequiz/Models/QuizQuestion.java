@@ -3,7 +3,7 @@ package com.aviparshan.isequiz.Models;
 
 import androidx.annotation.NonNull;
 
-import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
+import com.aviparshan.isequiz.Controller.Utils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,43 +17,18 @@ public class QuizQuestion implements Serializable {
     private String question;
     private int qType; //fromQuizUtils
     private int weekNum;
-//    static variable for week number
-    private static int weekNumber = 0;
     private String correctAnswer;
     private int correctAnswerIndex; //index to the right element in the possible answers list
     private int id = 0;
 
     private boolean showAnswer = false;
     private List<String> possibleAnswers;
-    public void setId(int id) {
-        this.id = id;
-    }
 
-    public int getqType() {
-        return qType;
-    }
-
-    public void setqType(int type) {
-        if(type <= 2 && type >= 0 ){
-            qType = type;
-        }
-        else{
-            qType = QuizUtils.UNKNOWN;
-        }
-    }
-
-    public List<String> getPossibleAnswers() {
-        return possibleAnswers;
-    }
-
-    public void setPossibleAnswers(List<String> possibleAnswers) {
-        this.possibleAnswers = possibleAnswers;
-    }
 
     public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int id, List<String> possibleAnswers) {
         this.question = question;
-        this.qType = qType;
-        this.weekNum = weekNum;
+        setqType(qType);
+        setWeekNum(weekNum);
         this.correctAnswer = correctAnswer;
         this.id = id;
         this.possibleAnswers = possibleAnswers;
@@ -61,8 +36,8 @@ public class QuizQuestion implements Serializable {
 
     public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int correctAnswerNumber, int id, List<String> possibleAnswers) {
         this.question = question;
-        this.qType = qType;
-        this.weekNum = weekNum;
+        setqType(qType);
+        setWeekNum(weekNum);
         this.correctAnswer = correctAnswer;
         this.correctAnswerIndex = correctAnswerNumber;
         this.id = id;
@@ -78,23 +53,12 @@ public class QuizQuestion implements Serializable {
         this.question = question;
     }
 
-//   set the static week number
-    public static void setWeekNumber(int weekNumber) {
-        if(weekNumber >= 0 && weekNumber <= 12)
-            QuizQuestion.weekNumber = weekNumber;
-        else
-            QuizQuestion.weekNumber = -1;
-    }
-//    static method to get the week number
-    public static int getWeekNumber() {
-        return weekNumber;
-    }
-
     public int getWeekNum() {
         return weekNum;
     }
+//   set the static week number
 
-    public void setWeekNum(int weekNum) {
+    public void setWeekNum(int weekNum) { //only have 12 weeks worth of questions
         if(weekNum >= 0 && weekNum <= 12){
             this.weekNum = weekNum;
         }
@@ -121,6 +85,39 @@ public class QuizQuestion implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public void setShowAnswer(boolean showAnswer) {
+        this.showAnswer = showAnswer;
+    }
+
+    public boolean getShowAnswer() {
+        return showAnswer;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getqType() {
+        return qType;
+    }
+
+    public void setqType(int type) {
+        if(type != Utils.OPEN_ANSWER && type != Utils.TRUE_FALSE && type != Utils.MULTIPLE_CHOICE){
+            qType = Utils.UNKNOWN;
+        }
+        else {
+            qType = type;
+        }
+    }
+
+    public List<String> getPossibleAnswers() {
+        return possibleAnswers;
+    }
+
+    public void setPossibleAnswers(List<String> possibleAnswers) {
+        this.possibleAnswers = possibleAnswers;
     }
 
     @NonNull
@@ -156,11 +153,5 @@ public class QuizQuestion implements Serializable {
         return result;
     }
 
-    public void setShowAnswer(boolean showAnswer) {
-        this.showAnswer = showAnswer;
-    }
 
-    public boolean getShowAnswer() {
-        return showAnswer;
-    }
 }

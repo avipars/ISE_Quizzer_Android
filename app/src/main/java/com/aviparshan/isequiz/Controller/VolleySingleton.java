@@ -8,6 +8,7 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
+import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
 
 /**
  * ISE Quiz
@@ -19,7 +20,6 @@ public class VolleySingleton {
     private RequestQueue requestQueue;
     private static Context ctx;
     private static final String TAG = VolleySingleton.class.getSimpleName();
-
 
     private VolleySingleton(Context context) {
         ctx = context;
@@ -70,5 +70,12 @@ public class VolleySingleton {
         requestQueue.cancelAll(tag);
     }
 
+    public static boolean isIsFinishedParsing() {
+        return QuestionParser.isIsFinishedParsing();
+    }
+
+    public static void setIsFinishedParsing(boolean is) {
+        QuestionParser.setIsFinishedParsing(is);
+    }
 
 }

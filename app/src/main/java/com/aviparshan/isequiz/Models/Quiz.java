@@ -19,6 +19,16 @@ public class Quiz implements Serializable {
 
     public static double version = -2.0;
 
+
+    public Quiz(int num, String subject, String url) {
+//        this.weekNum = num;
+        this.subject = subject;
+        this.url = url;
+//        this.week = String.format("Week %s", num);
+        setWeekNum(num);
+    }
+
+
     public String getUrl() {
         return url;
     }
@@ -27,22 +37,20 @@ public class Quiz implements Serializable {
         this.url = url;
     }
 
-    public Quiz(int num, String subject, String url) {
-        this.weekNum = num;
-        this.subject = subject;
-        this.url = url;
-        this.week = String.format(String.format("Week %s", num));
-    }
-
-
     public int getWeekNum() {
         return weekNum;
     }
 
     public void setWeekNum(int num) {
-        this.weekNum = num;
-        this.week = String.format(String.format("Week %s", num));
-
+        if(num >= 0 && num <= 13) {
+            this.weekNum = num;
+            this.week = String.format("Week %s", num);
+        }
+        else {
+            //not valid week
+            this.weekNum = -1;
+            this.week = "Week -1";
+        }
     }
 
     public String getWeek() {

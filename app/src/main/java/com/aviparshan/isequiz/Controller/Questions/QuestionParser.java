@@ -1,13 +1,13 @@
 package com.aviparshan.isequiz.Controller.Questions;
 
 
-import static com.aviparshan.isequiz.Controller.Quiz.QuizUtils.cToS;
+import static com.aviparshan.isequiz.Controller.Utils.cToS;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.aviparshan.isequiz.BuildConfig;
-import com.aviparshan.isequiz.Controller.Quiz.QuizUtils;
+import com.aviparshan.isequiz.Controller.Utils;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
 
@@ -19,26 +19,26 @@ import java.util.List;
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz.Controller
  */
-public class QuestionFetcher {
-    private static final String TAG = QuestionFetcher.class.getSimpleName();
+public class QuestionParser {
+    private static final String TAG = QuestionParser.class.getSimpleName();
     private static final String CACHE_KEY = "cached_data";
     public boolean done = false;
     private static List<QuizQuestion> sQuestions = new ArrayList<>();
     private final Context mContext;
     private Quiz q;
-    private static QuestionFetcher sQuizFetcher;
+    private static QuestionParser sQuizFetcher;
 
     private static boolean isFinishedParsing = false;
     //set the quiz
 
-    private QuestionFetcher(Context con, Quiz quiz) {
+    private QuestionParser(Context con, Quiz quiz) {
         this.mContext = con.getApplicationContext();
         q = quiz;
     }
 
-    public static QuestionFetcher getInstance(Context context, Quiz q) {
+    public static QuestionParser getInstance(Context context, Quiz q) {
         if (sQuizFetcher == null) {
-            sQuizFetcher = new QuestionFetcher(context, q);
+            sQuizFetcher = new QuestionParser(context, q);
         }
         return sQuizFetcher;
     }
@@ -80,19 +80,19 @@ public class QuestionFetcher {
             for (int i = 1; i < blocks.size()-1; ++i) { //foreach block in blocks
                 String s = blocks.get(i);
                 //open answer
-                index = s.indexOf(cToS(QuizUtils.OPEN));
+                index = s.indexOf(cToS(Utils.OPEN));
                 if(index != -1 && quiz.getWeekNum() != 12){  //special case for open answer and skip week 12 due to the non-open answer having it
                     questionText = s.substring(0, index).trim();
-                    qType = QuizUtils.OPEN_ANSWER;
+                    qType = Utils.OPEN_ANSWER;
                     trimmed = s.substring(index).trim(); // get the answer text
-                    possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.OPEN)))); //still put in array
+                    possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(Utils.OPEN)))); //still put in array
                     qAnswer = possibleAnswers.get(0).trim();
                     quizQ = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
                     sQuestions.add(quizQ);
                     continue; //skip to next question
                 }
                 //skip the first block (empty) or contains
-                index = s.indexOf(cToS(QuizUtils.ANSWER)); //first answer symbol
+                index = s.indexOf(cToS(Utils.ANSWER)); //first answer symbol
                 if(index <= -1 ) {
                     if(BuildConfig.DEBUG) {  // make sure index is within bounds
                         // handle the case where index is out of bounds
@@ -108,7 +108,7 @@ public class QuestionFetcher {
 //                now remove text until the first answer symbol
                 trimmed = s.substring(index).trim(); // get the answer text
 //split each answer on @ (answer)
-                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(QuizUtils.ANSWER)))); // split on @ (answer)
+                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(Utils.ANSWER)))); // split on @ (answer)
                 possibleAnswers.replaceAll(String::trim); // trim each answer
                 List<String> possibleAnsEdited = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public class QuestionFetcher {
                     }
                 }
 
-                qType = QuizUtils.getqType(possibleAnsEdited);
+                qType = Utils.getqType(possibleAnsEdited);
                 quizQ = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
                 sQuestions.add(quizQ);
                 ++qNum;
