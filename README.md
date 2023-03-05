@@ -21,3 +21,4 @@ Technology used
 
 Written with the MVC pattern in mind
 
+[![Android CI](https://github.com/avipars/ISE_Quizzer_Android/actions/workflows/android.yml/badge.svg)](https://github.com/avipars/ISE_Quizzer_Android/actions/workflows/android.yml)
