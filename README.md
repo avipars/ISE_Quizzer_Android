@@ -13,3 +13,11 @@ https://play.google.com/store/apps/details?id=com.aviparshan.isequiz
 </p>
 
 
+Technology used
+
+- Volley
+- RecyclerView
+- DiffUtil 
+
+Written with the MVC pattern in mind
+
