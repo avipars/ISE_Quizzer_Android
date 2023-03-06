@@ -1,15 +1,12 @@
 package com.aviparshan.isequiz.View;
 
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -24,6 +21,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Questions.QuestionAdapter;
 import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
+import com.aviparshan.isequiz.Controller.Utils;
 import com.aviparshan.isequiz.Controller.VolleySingleton;
 import com.aviparshan.isequiz.Models.Quiz;
 import com.aviparshan.isequiz.Models.QuizQuestion;
@@ -39,60 +37,12 @@ import java.util.Objects;
  */
 public class WeekView extends AppCompatActivity {
     private static final String TAG = WeekView.class.getSimpleName();
-    private static RequestQueue queue; //for volley
     private QuestionAdapter adapter;
     private List<QuizQuestion> quizQuestionList = new ArrayList<>(); //new empty list
     private RequestQueue mRequestQueue;
     private Quiz q;
 
     VolleySingleton volleySingleton;
-    //static method version of getData for pre-fetching
-    public static void prefetcher(Quiz quiz, Context context) {
-        //now fill the adapter, notify the adapter, and set the adapter to the recycler view
-        // wait until the parsing is done
-        //try again in a few
-        VolleySingleton volleySingleton = VolleySingleton.getInstance(context.getApplicationContext());
-        queue = volleySingleton.getRequestQueue();
-
-        StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                QuestionParser.parser(response, quiz);
-                // wait until the parsing is done
-                if (!QuestionParser.isIsFinishedParsing()) {
-                    //try again in a few
-                    while (!QuestionParser.isIsFinishedParsing()) {
-                        try {
-                            Thread.sleep(500); //wait half a second for a response
-                        } catch (InterruptedException e) {
-                            if (BuildConfig.DEBUG) {
-                                Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
-                            }
-                        }
-                    }
-                } else {
-                    //queue.stop();
-                    volleySingleton.stopRequestQueue();
-                }
-            }
-        }, error -> {
-            if (BuildConfig.DEBUG) {
-                Log.e(TAG, "onErrorResponse: " + error.toString());
-            }
-        });
-
-        //check if the request is already in cache
-        //if it is, then don't make the request
-        // Get a RequestQueue
-        if(!volleySingleton.isRequestQueueRunning()) {
-            volleySingleton.startRequestQueue();
-        }
-        //call the volley request
-        VolleySingleton.getInstance(context).addToRequestQueue(mStringRequest, TAG);
-
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +60,7 @@ public class WeekView extends AppCompatActivity {
             public void onItemLongClick(View itemView, int position) {
                 //copy the answer to the clipboard
                 String answer = adapter.getQuizQuestions().get(position).getCorrectAnswer();
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("answer", answer);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(WeekView.this, R.string.copied, Toast.LENGTH_SHORT).show();
+                Utils.copyToClipboardWithMessage(WeekView.this, answer, String.format(getResources().getString(R.string.smart_copy), answer));
             }
 
         });
@@ -143,7 +90,6 @@ public class WeekView extends AppCompatActivity {
     }
 
     public void getData(Quiz quiz) {
-
         //now fill the adapter, notify the adapter, and set the adapter to the recycler view
         // wait until the parsing is done
         //try again in a few
@@ -164,29 +110,23 @@ public class WeekView extends AppCompatActivity {
                         try {
                             Thread.sleep(500); //wait half a second for a response
                         } catch (InterruptedException e) {
-                            if (BuildConfig.DEBUG) {
-                                Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
-                            } else {
-                                Toast.makeText(WeekView.this, "Issue while parsing quiz", Toast.LENGTH_SHORT).show();
-                            }
+                            Utils.errorMessage(WeekView.this, e.getMessage(),R.string.issue_parsing, TAG);
                         }
                     }
                     adapter.updateModel(quizQuestionList);
                 }
             }
         }, error -> {
-            if (BuildConfig.DEBUG) Log.e(TAG, "onErrorResponse: " + error.toString());
-            else Toast.makeText(this, R.string.error_req, Toast.LENGTH_SHORT).show();
+            Utils.errorMessage(WeekView.this, error.toString(),R.string.error_req, TAG);
+
         });
 
-        if (!volleySingleton.isCacheEmpty(q.getUrl())) {
+        if (!volleySingleton.isCacheEmpty(quiz.getUrl())) {
             // Cache data available.
             String data = new String(Objects.requireNonNull(mRequestQueue.getCache().get(quiz.getUrl())).data);
             quizQuestionList = QuestionParser.parser(data, quiz);
             adapter.updateModel(quizQuestionList);
-            //if(BuildConfig.DEBUG){
-            //    Log.d(TAG, "getData: " +quiz.getWeekNum()  +  " cache is not null");
-            //}
+
         } else {
 
             // Cache data not exist.
@@ -201,7 +141,54 @@ public class WeekView extends AppCompatActivity {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "Week: " + quiz.getWeekNum() + " cache miss/empty");
             }
+
         }
+
+    }
+
+    //static method version of getData for pre-fetching
+    public static void prefetcher(Quiz quiz, Context context) {
+        //now fill the adapter, notify the adapter, and set the adapter to the recycler view
+        // wait until the parsing is done
+        //try again in a few
+        VolleySingleton volleySingleton = VolleySingleton.getInstance(context.getApplicationContext());
+
+        StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                QuestionParser.parser(response, quiz);
+                // wait until the parsing is done
+                if (!QuestionParser.isIsFinishedParsing()) {
+                    //try again in a few
+                    while (!QuestionParser.isIsFinishedParsing()) {
+                        try {
+                            Thread.sleep(500); //wait half a second for a response
+                        } catch (InterruptedException e) {
+                            if (BuildConfig.DEBUG) {
+                                Log.e(TAG, "onResponseInteruptedEE: " + e.getMessage());
+                            }
+                        }
+                    }
+                } else {
+                    volleySingleton.stopRequestQueue();
+                }
+            }
+        }, error -> {
+            if (BuildConfig.DEBUG) {
+                Log.e(TAG, "onErrorResponse: " + error.toString());
+            }
+        });
+
+        //check if the request is already in cache
+        //if it is, then don't make the request
+        // Get a RequestQueue
+        if(!volleySingleton.isRequestQueueRunning()) {
+            volleySingleton.startRequestQueue();
+        }
+        //call the volley request
+        volleySingleton.addToRequestQueue(mStringRequest, TAG);
+
 
     }
 
@@ -246,15 +233,10 @@ public class WeekView extends AppCompatActivity {
         if (id == R.id.action_retry) {
             //invalidate the old RV if it is a different week
             if (adapter != null && quizQuestionList != null) {
-            //    invalidate cache
-            //    mRequestQueue.getCache().invalidate(q.getUrl(), true);
-
             //    clear cache entry
                 volleySingleton.removeCacheItem(q.getUrl());
             //    get the data again
                 getData(q);
-                //adapter.addItems(quizQuestionList);
-
             }
             return true;
         } else if (id == R.id.action_toggle_answers) {
@@ -274,8 +256,7 @@ public class WeekView extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (mRequestQueue != null) {
-
+        if (volleySingleton.getRequestQueue() != null) {
             VolleySingleton.getInstance(this.getApplicationContext()).cancelRequest(TAG);
         }
     }

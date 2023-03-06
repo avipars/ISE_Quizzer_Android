@@ -11,12 +11,9 @@ import java.io.Serializable;
  */
 public class Quiz implements Serializable {
 
-    public static double version = -2.0;
-    private String subject;
-    private String url;
-    private String week;
+    public static double version = -1.0;
+    private String subject, url, week;
     private int weekNum;
-
 
     public Quiz(int num, String subject, String url) {
         this.subject = subject;
@@ -38,8 +35,9 @@ public class Quiz implements Serializable {
     }
 
     public void setWeekNum(int num) {
-        if (num >= 0 && num <= 13) {
+        if (num >= 1 && num <= 12) {
             this.weekNum = num;
+            //take the week stirng from the xml
             this.week = String.format("Week %s", num);
         } else {
             //not valid week

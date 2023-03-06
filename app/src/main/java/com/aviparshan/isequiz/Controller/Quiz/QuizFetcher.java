@@ -9,11 +9,10 @@ package com.aviparshan.isequiz.Controller.Quiz;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.aviparshan.isequiz.BuildConfig;
+import com.aviparshan.isequiz.Controller.Utils;
 import com.aviparshan.isequiz.Models.Quiz;
+import com.aviparshan.isequiz.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +27,6 @@ import java.util.List;
 
 public class QuizFetcher {
     private static final String TAG = QuizFetcher.class.getSimpleName();
-    private static final String QUIZZES_URL = "quizzes.json";
     private static QuizFetcher sQuizFetcher;
     private final Context mContext;
     private List<Quiz> mQuizzes;
@@ -74,7 +72,16 @@ public class QuizFetcher {
             try {
                 // Get quizzes JSON from the URL
                 AssetManager assetManager = mContext.getAssets();
-                InputStream is = assetManager.open(QUIZZES_URL);
+                InputStream is;
+                try{
+                    is = assetManager.open(Utils.QUIZZES_URL);
+
+                }catch (IOException e){
+                    Utils.errorMessage(mContext, "Error fetching quizzes.json", R.string.error_fetch,TAG);
+
+                    return null;
+                }
+
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 StringBuilder builder = new StringBuilder();
                 String line;
@@ -101,11 +108,7 @@ public class QuizFetcher {
                 //    now save the quizzes to the database
 
             } catch (IOException | JSONException e) {
-                if (BuildConfig.DEBUG) {
-                    Log.e(TAG, "Error fetching quizzes", e);
-                } else {
-                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
-                }
+                Utils.errorMessage(mContext, e.toString(), R.string.error_fetch,TAG);
                 if (mListener != null) {
                     mListener.onFetchError(e);
                 }
@@ -120,11 +123,7 @@ public class QuizFetcher {
             if (mListener != null && mQuizzes != null) {
                 mListener.onQuizzesFetched(mQuizzes);
             } else {
-                if (BuildConfig.DEBUG) {
-                    Log.e(TAG, "Error fetching quizzes");
-                } else {
-                    Toast.makeText(mContext, "Error fetching quizzes", Toast.LENGTH_SHORT).show();
-                }
+                Utils.errorMessage(mContext, "postExecute", R.string.error_fetch,TAG);
             }
 
         }

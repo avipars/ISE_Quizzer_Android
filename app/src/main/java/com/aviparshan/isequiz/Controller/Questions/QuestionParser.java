@@ -23,18 +23,20 @@ public class QuestionParser {
     private static final String TAG = QuestionParser.class.getSimpleName();
     private static final String CACHE_KEY = "cached_data";
     private static final List<QuizQuestion> sQuestions = new ArrayList<>();
+    //list of lists of questions
+    private static final List<List<QuizQuestion>> quizOfQuizzes = new ArrayList<>();
     private static QuestionParser sQuizFetcher;
     private static boolean isFinishedParsing = false;
     public boolean done = false;
     //set the quiz
 
-    private QuestionParser(Context con, Quiz quiz) {
+    public QuestionParser(Context con) {
         Context mContext = con.getApplicationContext();
     }
 
-    public static QuestionParser getInstance(Context context, Quiz q) {
+    public static QuestionParser getInstance(Context context) {
         if (sQuizFetcher == null) {
-            sQuizFetcher = new QuestionParser(context, q);
+            sQuizFetcher = new QuestionParser(context);
         }
         return sQuizFetcher;
     }
@@ -140,5 +142,31 @@ public class QuestionParser {
 
     public List<QuizQuestion> getQuizzes() {
         return sQuestions;
+    }
+
+    public void setQuizzes(List<QuizQuestion> quizzes) {
+        sQuestions.addAll(quizzes);
+    }
+
+    public List<List<QuizQuestion>> getQuizOfQuizzes() {
+        return quizOfQuizzes;
+    }
+
+    public static void setAllQuizOfQuizzes(List<List<QuizQuestion>> quizzes) {
+        quizOfQuizzes.addAll(quizzes);
+    }
+
+    public List<List<QuizQuestion>> getQuizOfQuizzes(int index) {
+        return quizOfQuizzes;
+    }
+
+    public static void setAllQuizOfQuizzes(List<List<QuizQuestion>> quizzes, int index) {
+        quizOfQuizzes.addAll(index, quizzes);
+    }
+
+    public static void setQuizOfQuizzes(List<QuizQuestion> quizzes, int index) {
+        //quizOfQuizzes.add(quizzes);
+        quizOfQuizzes.set(index, quizzes);
+
     }
 }

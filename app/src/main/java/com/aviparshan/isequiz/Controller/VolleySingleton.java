@@ -70,6 +70,7 @@ public class VolleySingleton {
         return requestQueue;
     }
 
+
     //    add request to queue with tag
     public <T> void addToRequestQueue(Request<T> req, String tag) {
         getRequestQueue().add(req).setTag(tag).setShouldCache(true);
@@ -99,6 +100,10 @@ public class VolleySingleton {
 
     //function to see if cache is empty for a given url
     public boolean isCacheEmpty(String url) {
+        return requestQueue.getCache().get(url) == null;
+    }
+
+    public static boolean isCacheEmpty(RequestQueue requestQueue, String url) {
         return requestQueue.getCache().get(url) == null;
     }
 

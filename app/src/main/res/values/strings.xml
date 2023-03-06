@@ -1,18 +1,30 @@
 <resources>
     <string name="app_name">ISE Quiz</string>
     <string name="action_settings">Settings</string>
+    <!--    week string with placeholder int-->
+    <string name="week">Week %d</string>
 
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
 
-    <string name="clear_cache">Clear Cache</string>
     <string name="search">Search…</string>
     <string name="toggle_answers">Toggle Answers</string>
+
+    <string name="smart_version">Version %1$d</string>
+    <string name="smart_copy">%1$s copied to clipboard</string>
     <string name="copied">Answer copied to clipboard</string>
-    <string name="no_internet">No Internet Connection</string>
+    <string name="failed_copy">Failed to copy to clipboard</string>
+
+    <string name="no_data_available">No data available</string>
+
     <string name="refresh_cache_for_all_weeks">Refresh Cache (for all weeks)</string>
-    <string name="error_fetch">Error Fetching Quizzes</string>
+    <string name="clear_cache">Clear Cache</string>
+
+    <string name="no_internet">No Internet Connection</string>
+    <string name="error_fetch">Error fetching quizzes</string>
     <string name="error_req">Error with quiz request</string>
+    <string name="s">Error fetching quizzes</string>
+    <string name="issue_parsing">Issue while parsing quiz</string>
 
 </resources>

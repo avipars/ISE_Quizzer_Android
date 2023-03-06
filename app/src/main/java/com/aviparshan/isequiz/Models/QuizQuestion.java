@@ -14,12 +14,10 @@ import java.util.List;
  */
 public class QuizQuestion implements Serializable {
 
-    private String question;
+    private String question,correctAnswer;
     private int qType; //fromQuizUtils
-    private int weekNum;
-    private String correctAnswer;
+    private int weekNum,id;
     private int correctAnswerIndex; //index to the right element in the possible answers list
-    private int id;
 
     private boolean showAnswer = false;
     private List<String> possibleAnswers;
