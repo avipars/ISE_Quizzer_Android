@@ -44,7 +44,7 @@ public class QuestionParser {
      * Parse the response from the server and form into list of question objects
      *
      * @param list text from server (quiz_#.txt)
-     * @return List of QuizQuestion objects
+     *
      */
 
     private static void printList(List<String> list) {

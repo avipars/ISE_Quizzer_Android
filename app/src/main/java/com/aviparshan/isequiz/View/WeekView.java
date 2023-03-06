@@ -50,11 +50,12 @@ public class WeekView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_view);
 
-        // Add this:
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
-                .detectLeakedClosableObjects()
-                .build());
-
+        if(BuildConfig.DEBUG)
+        {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
+                    .detectLeakedClosableObjects()
+                    .build());
+        }
 //        get the bundle from the intent
         q = (Quiz) getIntent().getSerializableExtra("quiz"); //        get the right week then fetch the questions (and answers) and cache them
         setTitle(q.getWeek());

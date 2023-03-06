@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
+import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Questions.QuestionParser;
 import com.aviparshan.isequiz.Controller.Quiz.QuizAdapter;
 import com.aviparshan.isequiz.Controller.Quiz.QuizFetcher;
@@ -47,10 +48,12 @@ public class Main extends AppCompatActivity {
 
         setContentView(R.layout.recycler_view);
 
-        // Add this:
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
-                .detectLeakedClosableObjects()
-                .build());
+        if(BuildConfig.DEBUG)
+        {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
+                    .detectLeakedClosableObjects()
+                    .build());
+        }
 
         recyclerView = findViewById(R.id.rvList);
         quizFetcher = QuizFetcher.getInstance(this);

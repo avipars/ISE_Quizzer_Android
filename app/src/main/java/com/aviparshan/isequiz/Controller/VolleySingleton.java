@@ -70,9 +70,6 @@ public class VolleySingleton {
         //    set cache for days (default is 30)
             cache.initialize();
 
-
-
-
         }
 
         return requestQueue;
