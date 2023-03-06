@@ -3,6 +3,7 @@ package com.aviparshan.isequiz.View;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,6 +50,11 @@ public class WeekView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_view);
 
+        // Add this:
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder(StrictMode.getVmPolicy())
+                .detectLeakedClosableObjects()
+                .build());
+
 //        get the bundle from the intent
         q = (Quiz) getIntent().getSerializableExtra("quiz"); //        get the right week then fetch the questions (and answers) and cache them
         setTitle(q.getWeek());
@@ -93,7 +99,7 @@ public class WeekView extends AppCompatActivity {
         //now fill the adapter, notify the adapter, and set the adapter to the recycler view
         // wait until the parsing is done
         //try again in a few
-        VolleySingleton volleySingleton = VolleySingleton.getInstance(this.getApplicationContext());
+        volleySingleton = VolleySingleton.getInstance(this.getApplicationContext());
         mRequestQueue = volleySingleton.getRequestQueue();
         StringRequest mStringRequest = new StringRequest(Request.Method.GET, quiz.getUrl(), new Response.Listener<String>() {
 

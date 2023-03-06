@@ -10,6 +10,8 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
 
+import java.util.Objects;
+
 /**
  * ISE Quiz
  * Created by Avi Parshan on 3/3/2023 on com.aviparshan.isequiz.Controller
@@ -65,6 +67,12 @@ public class VolleySingleton {
             requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
             DiskBasedCache cache = new DiskBasedCache(ctx.getCacheDir(), 16 * 1024 * 1024); // 16MB cap
             requestQueue = new RequestQueue(cache, new BasicNetwork(new HurlStack()));
+        //    set cache for days (default is 30)
+            cache.initialize();
+
+
+
+
         }
 
         return requestQueue;
@@ -103,6 +111,14 @@ public class VolleySingleton {
         return requestQueue.getCache().get(url) == null;
     }
 
+    //get the cache entry for a given url
+    public byte[] getCacheEntry(String url) {
+        return Objects.requireNonNull(requestQueue.getCache().get(url)).data;
+    }
+
+    public String getCacheEntryAsString(String url) {
+        return new String(getCacheEntry(url));
+    }
     public static boolean isCacheEmpty(RequestQueue requestQueue, String url) {
         return requestQueue.getCache().get(url) == null;
     }

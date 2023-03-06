@@ -74,12 +74,7 @@ public class Utils {
             ClipData clip = ClipData.newPlainText(context.getString(R.string.app_name), text);
             clipboard.setPrimaryClip(clip);
         } catch (Exception e) {
-            if(BuildConfig.DEBUG){
-                Log.e("ISEQuiz", "copyToClipboardBug: " + e.getMessage());
-            }
-            else{
-                Log.e("ISEQuiz", context.getString(R.string.failed_copy));
-            }
+            errorMessage(context,"copyToClipboardBug: " + e.getMessage(), R.string.failed_copy, TAG);
             return false;
         }
         return true;
@@ -89,7 +84,7 @@ public class Utils {
         if(copyToClipboard(context, text)){
             Toast.makeText(context, success, Toast.LENGTH_SHORT).show();
         }
-        else{
+        else {
             Toast.makeText(context, R.string.failed_copy, Toast.LENGTH_SHORT).show();
         }
     }

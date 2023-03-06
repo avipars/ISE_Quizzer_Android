@@ -65,7 +65,6 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         void onItemClick(View itemView, int position);
     }
 
-
     // Define interface for long click events
     public interface OnItemLongClickListener {
         void onItemLongClick(View itemView, int position);

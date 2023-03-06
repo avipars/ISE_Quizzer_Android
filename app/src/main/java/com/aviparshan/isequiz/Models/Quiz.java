@@ -21,7 +21,6 @@ public class Quiz implements Serializable {
         setWeekNum(num);
     }
 
-
     public String getUrl() {
         return url;
     }

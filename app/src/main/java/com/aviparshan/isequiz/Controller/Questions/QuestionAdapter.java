@@ -30,7 +30,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
 
     private static final int currentPos = 0;
     private List<QuizQuestion> quizQuestions, filteredQuestions;
-    //private List<QuizQuestion> ;
     private OnItemClickListener listener;
     private OnItemLongClickListener longListener;
 

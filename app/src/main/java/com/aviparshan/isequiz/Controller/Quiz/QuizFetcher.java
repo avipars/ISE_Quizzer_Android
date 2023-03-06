@@ -73,11 +73,11 @@ public class QuizFetcher {
                 // Get quizzes JSON from the URL
                 AssetManager assetManager = mContext.getAssets();
                 InputStream is;
-                try{
+                try {
                     is = assetManager.open(Utils.QUIZZES_URL);
 
-                }catch (IOException e){
-                    Utils.errorMessage(mContext, "Error fetching quizzes.json", R.string.error_fetch,TAG);
+                } catch (IOException e) {
+                    Utils.errorMessage(mContext, "Error fetching quizzes.json", R.string.error_fetch, TAG);
 
                     return null;
                 }
@@ -108,7 +108,7 @@ public class QuizFetcher {
                 //    now save the quizzes to the database
 
             } catch (IOException | JSONException e) {
-                Utils.errorMessage(mContext, e.toString(), R.string.error_fetch,TAG);
+                Utils.errorMessage(mContext, e.toString(), R.string.error_fetch, TAG);
                 if (mListener != null) {
                     mListener.onFetchError(e);
                 }
@@ -123,7 +123,7 @@ public class QuizFetcher {
             if (mListener != null && mQuizzes != null) {
                 mListener.onQuizzesFetched(mQuizzes);
             } else {
-                Utils.errorMessage(mContext, "postExecute", R.string.error_fetch,TAG);
+                Utils.errorMessage(mContext, "postExecute", R.string.error_fetch, TAG);
             }
 
         }

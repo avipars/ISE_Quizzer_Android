@@ -18,10 +18,9 @@ public class QuizQuestion implements Serializable {
     private int qType; //fromQuizUtils
     private int weekNum,id;
     private int correctAnswerIndex; //index to the right element in the possible answers list
-
     private boolean showAnswer = false;
     private List<String> possibleAnswers;
-
+    private int hash = -1;
 
     public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int id, List<String> possibleAnswers) {
         this.question = question;
@@ -116,6 +115,15 @@ public class QuizQuestion implements Serializable {
         this.possibleAnswers = possibleAnswers;
     }
 
+    public int getHash() {
+        if (hash == -1) {
+            hash = hashCode();
+        }
+        return hash;
+    }
+    public void setHash() {
+        hash = hashCode();
+    }
     @Override
     public int hashCode() {
         int result = getQuestion().hashCode();
