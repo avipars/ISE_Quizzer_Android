@@ -14,12 +14,13 @@ import java.util.List;
  */
 public class QuizQuestion implements Serializable {
 
-    private String question,correctAnswer;
+    private final String question,correctAnswer;
     private int qType; //fromQuizUtils
-    private int weekNum,id;
+    private  int weekNum = -1;
+    private int id;
     private int correctAnswerIndex; //index to the right element in the possible answers list
     private boolean showAnswer = false;
-    private List<String> possibleAnswers;
+    private final List<String> possibleAnswers;
     private int hash = -1;
 
     public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int id, List<String> possibleAnswers) {
@@ -46,9 +47,9 @@ public class QuizQuestion implements Serializable {
         return question;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
+//    public void setQuestion(String question) {
+//        this.question = question;
+//    }
 
     public int getWeekNum() {
         return weekNum;
@@ -67,9 +68,9 @@ public class QuizQuestion implements Serializable {
         return correctAnswer;
     }
 
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
+//    public void setCorrectAnswer(String correctAnswer) {
+//        this.correctAnswer = correctAnswer;
+//    }
 
     public int getCorrectAnswerNumber() {
         return correctAnswerIndex;
@@ -111,9 +112,9 @@ public class QuizQuestion implements Serializable {
         return possibleAnswers;
     }
 
-    public void setPossibleAnswers(List<String> possibleAnswers) {
-        this.possibleAnswers = possibleAnswers;
-    }
+//    public void setPossibleAnswers(List<String> possibleAnswers) {
+//        this.possibleAnswers = possibleAnswers;
+//    }
 
     public int getHash() {
         if (hash == -1) {

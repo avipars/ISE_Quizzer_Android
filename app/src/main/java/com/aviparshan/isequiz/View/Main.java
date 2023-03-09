@@ -205,7 +205,7 @@ public class Main extends AppCompatActivity {
         } else if (id == R.id.action_cache) {
             //clear cache for each of the quizzes
             VolleySingleton.getInstance(this).clearCache();
-            setUpListOfQuizzes();
+//            setUpListOfQuizzes();
             return true;
         }
 

@@ -11,7 +11,7 @@
     <string name="search">Search…</string>
     <string name="toggle_answers">Toggle Answers</string>
 
-    <string name="smart_version">Version %1$d</string>
+    <string name="smart_version">Version %f</string>
     <string name="smart_copy">%1$s copied to clipboard</string>
     <string name="copied">Answer copied to clipboard</string>
     <string name="failed_copy">Failed to copy to clipboard</string>
@@ -26,5 +26,7 @@
     <string name="error_req">Error with quiz request</string>
     <string name="s">Error fetching quizzes</string>
     <string name="issue_parsing">Issue while parsing quiz</string>
+    <string name="open_answer">Open Answer</string>
+    <string name="true_false">True or False</string>
 
 </resources>

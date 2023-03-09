@@ -75,11 +75,10 @@ public class QuestionParser {
 
             if (index != -1 && quiz.getWeekNum() != 12) {  //special case for open answer and skip week 12 due to the non-open answer having it
                 questionText = s.substring(0, index).trim();
-                qType = Utils.OPEN_ANSWER; //open answer
                 trimmed = s.substring(index).trim(); // get the answer text
                 possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(Utils.OPEN)))); //still put in array
                 qAnswer = possibleAnswers.get(0).trim(); //get the answer
-                sQuestions.add(new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, i-1, possibleAnswers)); //add to list
+                sQuestions.add(new QuizQuestion(questionText, Utils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, i, possibleAnswers)); //add to list
                 continue; //skip to next question
             }
             //skip the first block (empty) or contains
@@ -117,8 +116,7 @@ public class QuestionParser {
                 }
             }
 
-            qType = Utils.getqType(possibleAnsEdited); //get the question type
-            sQuestions.add(new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, i-1, possibleAnsEdited)); //add to list
+            sQuestions.add(new QuizQuestion(questionText, Utils.getqType(possibleAnsEdited), quiz.getWeekNum(), qAnswer, cAnsIndex, i, possibleAnsEdited)); //add to list
             ++qNum;
         }
         isFinishedParsing = true; //set the parsing to finished
@@ -161,6 +159,5 @@ public class QuestionParser {
     public static void setQuizOfQuizzes(List<QuizQuestion> quizzes, int index) {
         //quizOfQuizzes.add(quizzes);
         quizOfQuizzes.set(index, quizzes);
-
     }
 }

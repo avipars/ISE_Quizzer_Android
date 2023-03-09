@@ -211,7 +211,8 @@ public class WeekView extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 if(adapter != null)
                 {
-                    adapter.getFilter().filter(query);
+                    adapter.filter(query);
+//                    adapter.getFilter().filter(query);
                 }
                 return false;
             }
@@ -220,7 +221,8 @@ public class WeekView extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 if(adapter != null)
                 {
-                    adapter.getFilter().filter(newText);
+                    adapter.filter(newText);
+//                    adapter.getFilter().filter(newText);
                 }
                 return true;
             }
@@ -228,6 +230,35 @@ public class WeekView extends AppCompatActivity {
         item.setActionView(searchView);
         return super.onCreateOptionsMenu(menu);
     }
+//    private void filter(String text) {
+//
+//        // creating a new array list to filter our data.
+//        ArrayList<Country> filteredlist = new ArrayList<>();
+//        emptyView = findViewById(R.id.empty_view);
+//        // running a for loop to compare elements.
+//        for (Country item : countries) {
+//            // checking if the entered string matched with any item of our recycler view.
+//            if (CountrySort.inList(text, item)) {
+//                // if the item is matched we are
+//                // adding it to our filtered list.
+//                filteredlist.add(item);
+//            }
+//        }
+//        if (filteredlist.isEmpty()) {
+//            // if no item is added in filtered list we are
+//            // displaying a toast message as no data found.
+//            recyclerView.setVisibility(View.GONE);
+//            emptyView.setVisibility(View.VISIBLE);
+////            Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
+//        } else {
+//            // at last we are passing that filtered
+//            // list to our adapter class.
+////            adapter.filterList(filteredlist);
+//            recyclerView.setVisibility(View.VISIBLE);
+//            emptyView.setVisibility(View.GONE);
+//            adapter.swapData(filteredlist);
+//        }
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
