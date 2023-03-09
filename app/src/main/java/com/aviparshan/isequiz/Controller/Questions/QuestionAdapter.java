@@ -2,6 +2,7 @@ package com.aviparshan.isequiz.Controller.Questions;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import java.util.List;
  * ISE Quiz
  * Created by Avi Parshan on 2/24/2023 on com.aviparshan.isequiz.Controller
  */
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> implements Filterable {
+public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder>  {
 
     private static final int currentPos = 0;
     private List<QuizQuestion> quizQuestions, filteredQuestions;
@@ -49,9 +50,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     public QuestionAdapter(List<QuizQuestion> q) {
 //        super();
 //        fix the issue with arguments
-
         this.quizQuestions = q;
-        this.filteredQuestions = new ArrayList<>(quizQuestions);
+        this.filteredQuestions = q;
     }
 
     public List<QuizQuestion> getQuizQuestions() {
@@ -80,7 +80,10 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         this.quizQuestions.addAll(newQ); //add the new list
         this.filteredQuestions = quizQuestions;
         //notify that the whole list has changed, so diffUtil doesn't really matter
-        notifyDataSetChanged();
+        DiffUtil.DiffResult DiffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, newQ));
+        DiffResult.dispatchUpdatesTo(this);
+
+//        notifyDataSetChanged();
     }
 
 
@@ -127,55 +130,60 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         this.longListener = longListener;
     }
 
-    @Override
-    public Filter getFilter() {
-        //    uses the filter method filter()
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                String charString = constraint.toString();
-                if (charString.isEmpty()) {
-                    filteredQuestions = quizQuestions;
-                } else {
-                    List<QuizQuestion> filteredList = new ArrayList<>();
-                    for (QuizQuestion row : quizQuestions) {
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
-                        if (row.getQuestion().toLowerCase().contains(charString.toLowerCase())
-                                || row.getCorrectAnswer().toLowerCase().contains(charString.toLowerCase())) {
-                            filteredList.add(row);
-                        }
-                    }
-                    filteredQuestions = filteredList;
-                }
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = filteredQuestions;
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                //use DiffUtil to calculate the difference between the old and new list
-//                use the DiffCallback Class I made
-                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, filteredQuestions));
-                quizQuestions = filteredQuestions;
-                diffResult.dispatchUpdatesTo(QuestionAdapter.this);
-            }
-        };
-    }
+//    @Override
+//    public Filter getFilter() {
+//        //    uses the filter method filter()
+//        return new Filter() {
+//            @Override
+//            protected FilterResults performFiltering(CharSequence constraint) {
+//                String charString = constraint.toString();
+//                if (charString.isEmpty()) {
+//                    filteredQuestions = quizQuestions;
+//                } else {
+//                    List<QuizQuestion> filteredList = new ArrayList<>();
+//                    for (QuizQuestion row : quizQuestions) {
+//                        // name match condition. this might differ depending on your requirement
+//                        // here we are looking for name or phone number match
+//                        if (row.getQuestion().toLowerCase().contains(charString.toLowerCase())
+//                                || row.getCorrectAnswer().toLowerCase().contains(charString.toLowerCase())) {
+//                            filteredList.add(row);
+//                        }
+//                    }
+//                    filteredQuestions = filteredList;
+//                }
+//                FilterResults filterResults = new FilterResults();
+//                filterResults.values = filteredQuestions;
+//                return filterResults;
+//            }
+//
+//            @Override
+//            protected void publishResults(CharSequence constraint, FilterResults results) {
+//                //use DiffUtil to calculate the difference between the old and new list
+////                use the DiffCallback Class I made
+//                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new QuizDiffCallback(quizQuestions, filteredQuestions));
+//                quizQuestions = filteredQuestions;
+//                diffResult.dispatchUpdatesTo(QuestionAdapter.this);
+//            }
+//        };
+//    }
 
     public void setAllAnswers(boolean show) {
         for (QuizQuestion q : filteredQuestions) {
             q.setShowAnswer(show);
-            notifyItemChanged(filteredQuestions.indexOf(q));
+            notifyItemChanged(filteredQuestions.indexOf(q),q);
         }
+//        notifyDataSetChanged();
     }
 
     //get the question at a specific position and set to toggle what is shown
-    public void toggleAnswer(int position) {
+    public void toggleAnswer(int position, QuizQuestion qz) {
+
+
         //if it was shown, hide it , else show it
-        filteredQuestions.get(position).setShowAnswer(!filteredQuestions.get(position).getShowAnswer());
-        notifyItemChanged(position);
+        int pos = filteredQuestions.indexOf(qz) == position ? position : filteredQuestions.indexOf(qz);
+
+        filteredQuestions.get(pos).setShowAnswer(!filteredQuestions.get(pos).getShowAnswer());
+        notifyItemChanged(position, qz);
     }
 
     //getWeekNum
@@ -223,7 +231,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
     }
 
     public interface OnItemClickListener {
-        void onItemClick(QuizQuestion question);
+        void onItemClick(View itemView, int position);
     }
 
 
@@ -245,11 +253,9 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         diffResult.dispatchUpdatesTo(this);
     }
 
-
     private static class QuizDiffCallback extends DiffUtil.Callback {
 
-        private final List<QuizQuestion> oldList;
-        private final List<QuizQuestion> newList;
+        private final List<QuizQuestion> oldList, newList;
 
         public QuizDiffCallback(List<QuizQuestion> oldList, List<QuizQuestion> newList) {
             this.oldList = oldList;
@@ -275,7 +281,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             QuizQuestion oldQuestion = oldList.get(oldItemPosition);
             QuizQuestion newQuestion = newList.get(newItemPosition);
-            return oldQuestion.getQuestion().equals(newQuestion.getQuestion()) && oldQuestion.getCorrectAnswer().equals(newQuestion.getCorrectAnswer());
+            return oldQuestion.getQuestion().equals(newQuestion.getQuestion()) &&
+                    oldQuestion.getCorrectAnswer().equals(newQuestion.getCorrectAnswer());
         }
 
         @Nullable
@@ -289,6 +296,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             }
             if (!oldQuestion.getCorrectAnswer().equals(newQuestion.getCorrectAnswer())) {
                 payload.putString("answer", newQuestion.getCorrectAnswer());
+            }
+            if(oldQuestion.getShowAnswer() != newQuestion.getShowAnswer()) {
+                payload.putBoolean("showAnswer", newQuestion.getShowAnswer());
+            }
+            if(!oldQuestion.getPossibleAnswers().equals(newQuestion.getPossibleAnswers())) {
+                payload.putStringArrayList("answers", (ArrayList<String>) newQuestion.getPossibleAnswers());
             }
             if (payload.size() == 0) {
                 return null;
@@ -320,7 +333,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION && listener != null) {
                 QuizQuestion question = filteredQuestions.get(position);
-                listener.onItemClick(question);
+                Log.e("QuestionViewHolder", "onClick: " + question.getPossibleAnswers().toString());
+                listener.onItemClick(itemView, position);
             }
         }
 
@@ -337,35 +351,49 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
         public void bindQuestion(QuizQuestion question) {
             questionTextView.setText(question.getQuestion());
             //weekTextView.setText("Week: " + question.gele tWeekNum());
-            // only append once and don't allow it to be changed
-            if (allAnswersTextView.getText().length() == 0) {
+
+            if (allAnswersTextView.getText().length() <= 0) { // only append once and don't allow it to be changed
 //                get the string from resource
                 if(question.getqType() == Utils.OPEN_ANSWER){
-
-                    allAnswersTextView.append(itemView.getContext().getString(R.string.open_answer));
+                    allAnswersTextView.setText(itemView.getContext().getString(R.string.open_answer));
+                    allAnswersTextView.append("\n" + question.getPossibleAnswers().toString());
                 }
                 else if(question.getqType() == Utils.TRUE_FALSE){
 //                    get the string from the string resource file
-                    allAnswersTextView.append(itemView.getContext().getString(R.string.true_false));
+                    allAnswersTextView.setText(itemView.getContext().getString(R.string.true_false));
+                    allAnswersTextView.append("\n" + question.getPossibleAnswers().toString());
+
                 }
-                else{
+                else if(question.getqType() == Utils.MULTIPLE_CHOICE){
                     for (int i = 0; i < question.getPossibleAnswers().size(); ++i) {
                         allAnswersTextView.append(i+1 + ". " + question.getPossibleAnswers().get(i)); //last one
                         if(i != question.getPossibleAnswers().size() - 1){ //not last
                             allAnswersTextView.append("\n");
                         }
                     }
+//                    allAnswersTextView.setText(question.getPossibleAnswers().toString());
+
+                }
+                else{
+                    allAnswersTextView.setText("unknown" + question.getqType());
                 }
                 //get all answers as a list and display them in the possible answers text view, with a newline between each answer
             }
+            answerTextView.setVisibility(View.VISIBLE);
             answerTextView.setText(question.getCorrectAnswer());
-            if (question.getShowAnswer()) { //hide unless clicked
-                answerTextView.setVisibility(View.VISIBLE);
-                allAnswersTextView.setVisibility(View.GONE);
-            } else {
-                answerTextView.setVisibility(View.GONE);
-                allAnswersTextView.setVisibility(View.VISIBLE);
-            }
+            allAnswersTextView.setVisibility(View.VISIBLE);
+//            if (question.getShowAnswer()) { //hide unless clicked
+//                answerTextView.setVisibility(View.VISIBLE);
+//                answerTextView.setText(question.getCorrectAnswer());
+//                allAnswersTextView.setVisibility(View.GONE);
+//            } else {
+//                answerTextView.setVisibility(View.GONE);
+//                answerTextView.setText("");
+//                allAnswersTextView.setVisibility(View.VISIBLE);
+//            }
+
+
         }
+
     }
 }

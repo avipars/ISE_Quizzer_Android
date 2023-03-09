@@ -78,7 +78,6 @@ public class QuizFetcher {
 
                 } catch (IOException e) {
                     Utils.errorMessage(mContext, "Error fetching quizzes.json", R.string.error_fetch, TAG);
-
                     return null;
                 }
 
@@ -100,13 +99,9 @@ public class QuizFetcher {
                     int quizNumber = quizJson.getInt("number");
                     String quizSubject = quizJson.getString("subject");
                     String quizUrl = quizJson.getString("path");
-
-                    Quiz quiz = new Quiz(quizNumber, quizSubject, quizUrl);
-                    quizzes.add(quiz);
+                    quizzes.add(new Quiz(quizNumber, quizSubject, quizUrl));
                 }
-
                 //    now save the quizzes to the database
-
             } catch (IOException | JSONException e) {
                 Utils.errorMessage(mContext, e.toString(), R.string.error_fetch, TAG);
                 if (mListener != null) {
@@ -128,5 +123,4 @@ public class QuizFetcher {
 
         }
     }
-
 }

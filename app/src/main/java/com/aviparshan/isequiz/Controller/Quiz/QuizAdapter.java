@@ -7,11 +7,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aviparshan.isequiz.Controller.Questions.QuestionAdapter;
 import com.aviparshan.isequiz.Models.Quiz;
+import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +48,6 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     public QuizAdapter.QuizViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.quiz_item, viewGroup, false);
-
         return new QuizViewHolder(view);
     }
 

@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class SharedPreferencesCache implements Cache {
 
-   private SharedPreferences sharedPreferences;
+   private final SharedPreferences sharedPreferences;
 
    public SharedPreferencesCache(Context context) {
       this.sharedPreferences = context.getSharedPreferences("volley_cache", Context.MODE_PRIVATE);

@@ -26,8 +26,6 @@ public class Utils {
     public static final int OPEN_ANSWER = 2;
     public static final int UNKNOWN = 3;
 
-    public static final String quiz_key = "quiz_key";
-    public static final String quiz_name = "quiz_name";
     public static final String QUIZZES_URL = "quizzes.json";
 
     public static final char OPEN = '~', ANSWER = '@', QUESTION = '$', SOLUTION = '*', WEEK_NUM = '#';
@@ -48,18 +46,20 @@ public class Utils {
     /**
      * get the question type given the possible answers list size
      */
-    public static int getqType(List<String> possibleAnsEdited) {
-        int qType;
-        if (possibleAnsEdited.size() == 1) {
-            qType = Utils.OPEN_ANSWER;
-        } else if (possibleAnsEdited.size() == 2) {
-            qType = Utils.TRUE_FALSE;
-        } else if (possibleAnsEdited.size() > 2) {
-            qType = Utils.MULTIPLE_CHOICE;
-        } else {
-            qType = Utils.UNKNOWN;
+    public static int getqType(int size) {
+        if (size == 1) {
+            return Utils.OPEN_ANSWER;
+        } else if (size == 2) {
+            return Utils.TRUE_FALSE;
         }
-        return qType;
+        else if(size > 2){
+            return Utils.MULTIPLE_CHOICE;
+        }
+        else{
+//            error
+            throw new IllegalArgumentException("getqType: size is less than 1");
+//            return Utils.UNKNOWN;
+        }
     }
 
     public static boolean isConnectedToInternet(Context context) {
@@ -74,37 +74,33 @@ public class Utils {
             ClipData clip = ClipData.newPlainText(context.getString(R.string.app_name), text);
             clipboard.setPrimaryClip(clip);
         } catch (Exception e) {
-            errorMessage(context,"copyToClipboardBug: " + e.getMessage(), R.string.failed_copy, TAG);
+            errorMessage(context, "copyToClipboardBug: " + e.getMessage(), R.string.failed_copy, TAG);
             return false;
         }
         return true;
     }
 
-    public static void copyToClipboardWithMessage(Context context,String text, String success){
-        if(copyToClipboard(context, text)){
+    public static void copyToClipboardWithMessage(Context context, String text, String success) {
+        if (copyToClipboard(context, text)) {
             Toast.makeText(context, success, Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Toast.makeText(context, R.string.failed_copy, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static void errorMessage(Context context, String message, int prod_message, String TAG){
-        if(BuildConfig.DEBUG){
+    public static void errorMessage(Context context, String message, int prod_message, String TAG) {
+        if (BuildConfig.DEBUG) {
             Log.e(TAG, "ISE_ERROR: " + message);
-        }
-        else{
+        } else {
             Toast.makeText(context, prod_message, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static void errorMessage(Context context, String message, String prod_message, String TAG){
-        if(BuildConfig.DEBUG){
+    public static void errorMessage(Context context, String message, String prod_message, String TAG) {
+        if (BuildConfig.DEBUG) {
             Log.e(TAG, "ISE_ERROR: " + message);
-        }
-        else{
+        } else {
             Toast.makeText(context, prod_message, Toast.LENGTH_SHORT).show();
         }
     }
-
 }

@@ -4,10 +4,12 @@ package com.aviparshan.isequiz.View;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -56,8 +58,8 @@ public class WeekView extends AppCompatActivity {
                     .detectLeakedClosableObjects()
                     .build());
         }
-//        get the bundle from the intent
-        q = (Quiz) getIntent().getSerializableExtra("quiz"); //        get the right week then fetch the questions (and answers) and cache them
+        // get the bundle from the intent
+        q = (Quiz) getIntent().getSerializableExtra("quiz"); //  get the right week then fetch the questions (and answers) and cache them
         setTitle(q.getWeek());
         setUp(q);
 
@@ -74,10 +76,14 @@ public class WeekView extends AppCompatActivity {
 
         adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(QuizQuestion question) {
+            public void onItemClick(View itemView, int position) {
                 //show the answer
-                adapter.toggleAnswer(adapter.getQuizQuestions().indexOf(question));
-                adapter.notifyItemChanged(adapter.getQuizQuestions().indexOf(question));
+                QuizQuestion question = adapter.getQuizQuestions().get(position);
+                Toast.makeText(WeekView.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+                adapter.toggleAnswer(position, question);
+//                notify via diffUtil
+//                adapter.updateModel(adapter.getQuizQuestions());
+//                adapter.notifyItemChanged(adapter.getQuizQuestions().indexOf(question));
             }
         });
     }
@@ -199,21 +205,16 @@ public class WeekView extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_questions, menu);
-        MenuItem item = menu.findItem(R.id.actionSearch);
+    void startSearch(MenuItem item){
         SearchView searchView = (SearchView) item.getActionView();
         searchView.setQueryHint(getString(R.string.search));
+//        SearchManager searchManager=(SearchManager)getSystemService(Context.SEARCH_SERVICE);
+//
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(adapter != null)
-                {
-                    adapter.filter(query);
-//                    adapter.getFilter().filter(query);
-                }
                 return false;
             }
 
@@ -222,43 +223,23 @@ public class WeekView extends AppCompatActivity {
                 if(adapter != null)
                 {
                     adapter.filter(newText);
-//                    adapter.getFilter().filter(newText);
+                    //save the query INTO suggestions
+//
                 }
                 return true;
             }
         });
         item.setActionView(searchView);
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_questions, menu);
+        MenuItem item = menu.findItem(R.id.actionSearch);
+        startSearch(item);
         return super.onCreateOptionsMenu(menu);
     }
-//    private void filter(String text) {
-//
-//        // creating a new array list to filter our data.
-//        ArrayList<Country> filteredlist = new ArrayList<>();
-//        emptyView = findViewById(R.id.empty_view);
-//        // running a for loop to compare elements.
-//        for (Country item : countries) {
-//            // checking if the entered string matched with any item of our recycler view.
-//            if (CountrySort.inList(text, item)) {
-//                // if the item is matched we are
-//                // adding it to our filtered list.
-//                filteredlist.add(item);
-//            }
-//        }
-//        if (filteredlist.isEmpty()) {
-//            // if no item is added in filtered list we are
-//            // displaying a toast message as no data found.
-//            recyclerView.setVisibility(View.GONE);
-//            emptyView.setVisibility(View.VISIBLE);
-////            Toast.makeText(this, R.string.no_data, Toast.LENGTH_SHORT).show();
-//        } else {
-//            // at last we are passing that filtered
-//            // list to our adapter class.
-////            adapter.filterList(filteredlist);
-//            recyclerView.setVisibility(View.VISIBLE);
-//            emptyView.setVisibility(View.GONE);
-//            adapter.swapData(filteredlist);
-//        }
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -283,7 +264,6 @@ public class WeekView extends AppCompatActivity {
             adapter.setAllAnswers(val);
             item.setChecked(val);
             return true;
-
         } else if (id == R.id.actionSearch) {
             //search
             return true;

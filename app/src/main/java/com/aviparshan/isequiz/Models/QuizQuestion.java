@@ -20,7 +20,7 @@ public class QuizQuestion implements Serializable {
     private int id;
     private int correctAnswerIndex; //index to the right element in the possible answers list
     private boolean showAnswer = false;
-    private final List<String> possibleAnswers;
+    private List<String> possibleAnswers;
     private int hash = -1;
 
     public QuizQuestion(String question, int qType, int weekNum, String correctAnswer, int id, List<String> possibleAnswers) {
@@ -47,10 +47,6 @@ public class QuizQuestion implements Serializable {
         return question;
     }
 
-//    public void setQuestion(String question) {
-//        this.question = question;
-//    }
-
     public int getWeekNum() {
         return weekNum;
     }
@@ -67,10 +63,6 @@ public class QuizQuestion implements Serializable {
     public String getCorrectAnswer() {
         return correctAnswer;
     }
-
-//    public void setCorrectAnswer(String correctAnswer) {
-//        this.correctAnswer = correctAnswer;
-//    }
 
     public int getCorrectAnswerNumber() {
         return correctAnswerIndex;
@@ -101,8 +93,8 @@ public class QuizQuestion implements Serializable {
     }
 
     public void setqType(int type) {
-        if (type != Utils.OPEN_ANSWER && type != Utils.TRUE_FALSE && type != Utils.MULTIPLE_CHOICE) {
-            qType = Utils.UNKNOWN;
+        if(type == Utils.UNKNOWN){
+            throw new IllegalArgumentException("setqType: type is UNKNOWN");
         } else {
             qType = type;
         }
@@ -112,9 +104,9 @@ public class QuizQuestion implements Serializable {
         return possibleAnswers;
     }
 
-//    public void setPossibleAnswers(List<String> possibleAnswers) {
-//        this.possibleAnswers = possibleAnswers;
-//    }
+    public void setPossibleAnswers(List<String> possibleAnswers) {
+        this.possibleAnswers = possibleAnswers;
+    }
 
     public int getHash() {
         if (hash == -1) {
@@ -157,6 +149,4 @@ public class QuizQuestion implements Serializable {
     public String toString() {
         return "Question: " + question + " Week: " + weekNum + " Correct Answer: " + correctAnswer + " Correct Answer Number: " + correctAnswerIndex + " ID: " + id;
     }
-
-
 }

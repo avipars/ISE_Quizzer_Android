@@ -1,5 +1,6 @@
 package com.aviparshan.isequiz.View;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,10 +72,12 @@ public class Main extends AppCompatActivity {
         if (!Utils.isConnectedToInternet(this)) //warn the user if they are not connected to the internet
         {
             Toast.makeText(this, R.string.no_internet, Toast.LENGTH_SHORT).show(); //send a toast to the user
-        } else {
-            //    ch
-            //setUpListOfQuizzes();
         }
+
+//        else {
+//            //    ch
+//            //setUpListOfQuizzes();
+//        }
 
         volleySingleton = VolleySingleton.getInstance(getApplicationContext());
 
@@ -183,11 +187,26 @@ public class Main extends AppCompatActivity {
         recyclerView.setAdapter(qa);
     }
 
+    void startSearch(String query) {
+//        using the text listener to change text
+        MyOnQueryTextListener myOnQueryTextListener = new MyOnQueryTextListener();
+        myOnQueryTextListener.onQueryTextChange(query);
 
+    }
+//    search for all questions in all quizzes
+    void startSearch(SearchView searchView){
+        searchView.setQueryHint(getString(R.string.search_quiz));
+        searchView.setOnQueryTextListener(new MyOnQueryTextListener());
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item = menu.findItem(R.id.actionSearch);
+        SearchView searchView = (SearchView) item.getActionView();
+        startSearch(searchView);
+        item.setActionView(searchView);
+
         return true;
     }
 
@@ -208,6 +227,11 @@ public class Main extends AppCompatActivity {
 //            setUpListOfQuizzes();
             return true;
         }
+        else if(id == R.id.actionSearch){
+//            search for all questions in all quizzes
+//            search through all quizzes and all questions
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -217,6 +241,37 @@ public class Main extends AppCompatActivity {
         super.onStop();
         if (volleySingleton.getRequestQueue() != null) {
             VolleySingleton.getInstance(this.getApplicationContext()).cancelRequest(TAG);
+        }
+    }
+
+    private class MyOnQueryTextListener implements SearchView.OnQueryTextListener {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            //filter the list of quizzes
+            List<Quiz> filteredList = new ArrayList<>();
+            for (Quiz quiz : quizzes) {
+                if (quiz.getSubject().toLowerCase().contains(newText.toLowerCase()) || quiz.getWeek().toLowerCase().contains(newText.toLowerCase())) {
+                    filteredList.add(quiz);
+                }
+            }
+            //update the adapter
+            QuizAdapter qa = new QuizAdapter(filteredList);
+            qa.setOnItemClickListener(((itemView, position) -> {
+                Quiz quiz = quizzes.get(position);
+                Utils.copyToClipboardWithMessage(Main.this, quiz.getSubject(), String.format(getResources().getString(R.string.smart_copy), quiz.getSubject()));
+
+            }));
+            qa.setOnItemLongClickListener(((itemView, position) -> {
+                Quiz quiz = quizzes.get(position);
+                passDataToNextActivity(quiz);
+            }));
+            recyclerView.setAdapter(qa);
+            return true;
         }
     }
 }

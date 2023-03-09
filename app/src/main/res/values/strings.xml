@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ISE Quiz</string>
+    <string name="app_name">ISE Quizzer</string>
     <string name="action_settings">Settings</string>
     <!--    week string with placeholder int-->
     <string name="week">Week %d</string>
@@ -7,8 +7,8 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-
-    <string name="search">Search…</string>
+    <string name="search_quiz">Search for Quizzes</string>
+    <string name="search">Search for Questions and Answers</string>
     <string name="toggle_answers">Toggle Answers</string>
 
     <string name="smart_version">Version %f</string>

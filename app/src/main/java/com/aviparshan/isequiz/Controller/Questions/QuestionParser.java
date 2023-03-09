@@ -2,9 +2,11 @@ package com.aviparshan.isequiz.Controller.Questions;
 
 
 import static com.aviparshan.isequiz.Controller.Utils.cToS;
+import static com.aviparshan.isequiz.Controller.Utils.getqType;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Utils;
@@ -21,16 +23,15 @@ import java.util.List;
  */
 public class QuestionParser {
     private static final String TAG = QuestionParser.class.getSimpleName();
-    private static final String CACHE_KEY = "cached_data";
     private static final List<QuizQuestion> sQuestions = new ArrayList<>();
     //list of lists of questions
     private static final List<List<QuizQuestion>> quizOfQuizzes = new ArrayList<>();
     private static QuestionParser sQuizFetcher;
     private static boolean isFinishedParsing = false;
     //set the quiz
-
+    private final Context mContext;
     public QuestionParser(Context con) {
-        Context mContext = con.getApplicationContext();
+        mContext = con.getApplicationContext();
     }
 
     public static QuestionParser getInstance(Context context) {
@@ -51,72 +52,96 @@ public class QuestionParser {
         int i = 0;
         for (String s : list) {
             Log.e(TAG, "print: " + s + " " + i);
-            i++;
+            ++i;
         }
     }
 
     public static List<QuizQuestion> parser(String response, Quiz quiz) {
+
         List<QuizQuestion> sQuestions = new ArrayList<>(); // create an empty list of questions
-        String trimmed, questionText, qAnswer = "";
-        List<String> possibleAnswers;
+        List<String> possibleAnswers = new ArrayList<>(); //create an empty list of possible answers
+
         String[] arr = response.split("");
         String joined = String.join("", arr);
         List<String> blocks = Arrays.asList(joined.split("\\$")); // split on $ (question)
+        QuizQuestion qz;
+
+        String trimmed = "", questionText = "", qAnswer = "";
 
         int index; //string index
         int qType, qNum = 0;
-        int ansIndex, cAnsIndex;
+        int cAnsIndex;
 //            range loop through each question (only handle T,F and MC for now)
-//        skip first block (empty)
 
+//        skip first block (empty)
         for (int i = 1; i < blocks.size() - 1; ++i) { //foreach block in blocks
             String s = blocks.get(i);
             index = s.indexOf(cToS(Utils.OPEN)); //look for open answer
 
+//            possibleAnswers.clear(); //clear the possible answers
+//                check if questionText contains any characters
+
             if (index != -1 && quiz.getWeekNum() != 12) {  //special case for open answer and skip week 12 due to the non-open answer having it
-                questionText = s.substring(0, index).trim();
+                questionText = s.substring(0, index).trim(); // get the question text
+
                 trimmed = s.substring(index).trim(); // get the answer text
-                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(Utils.OPEN)))); //still put in array
+//                possibleAnswers is only a single element list
+                possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(Utils.OPEN_S))); //still put in array
                 qAnswer = possibleAnswers.get(0).trim(); //get the answer
-                sQuestions.add(new QuizQuestion(questionText, Utils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, i, possibleAnswers)); //add to list
+                qz = new QuizQuestion(questionText, Utils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
+                sQuestions.add(qz); //add to list
+                ++qNum;
                 continue; //skip to next question
             }
             //skip the first block (empty) or contains
-            index = s.indexOf(cToS(Utils.ANSWER)); //first answer symbol
-            if (index <= -1) {
-                if (BuildConfig.DEBUG) {  // make sure index is within bounds
-                    // handle the case where index is out of bounds
-                    // for example, print an error message or set a default value for questionText
+            index = s.indexOf(Utils.ANSWER_S); //first answer symbol
+            if (index <= -1) {  // make sure index is within bounds
+                if(BuildConfig.DEBUG) {
                     Log.e(TAG, "parser index <=-1: " + s + " " + index);
                 }
+                continue;
             }
-
             questionText = s.substring(0, index).trim(); // get the question text
-//                check if questionText contains any characters
-            if (questionText.isEmpty()) continue; //empty string, break
+            if (questionText.isEmpty()) continue; //empty string, break (EOF)
 
 //                now remove text until the first answer symbol
             trimmed = s.substring(index).trim(); // get the answer text
 //split each answer on @ (answer)
-            possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(cToS(Utils.ANSWER)))); // split on @ (answer)
+            possibleAnswers = new ArrayList<>(Arrays.asList(trimmed.substring(1).split(Utils.ANSWER_S)));
+            // split on @ (answer) //
             possibleAnswers.replaceAll(String::trim); // trim each answer
-            List<String> possibleAnsEdited = new ArrayList<>();
+//            printList(possibleAnswers);
+            List<String> possibleAnsEdited = new ArrayList<>(); //clear the possibleEdit answers
 
-            ansIndex = 0; //reset answer index
             cAnsIndex = 0; //reset correct answer index for each question
-
-            for (String ans : possibleAnswers) { //go through each answer and put in a list
-//                get the array index of the correct answer
-                possibleAnsEdited.add(ans.trim().replace("*", ""));
-                if (ans.contains("*")) { //correct answer, hide the solution symbol
-                    qAnswer = ans.trim().replace("*", "");
-                    cAnsIndex = ansIndex; //set the correct answer index
-                } else {
-                    ++ansIndex; //increment the answer index to the next answer
+            String ans2 = "";
+            for(int j = 0; j < possibleAnswers.size(); ++j) {
+                ans2 = possibleAnswers.get(j); //ans string
+                if(ans2.contains("*")){ //correct answer, hide the solution symbol
+                    qAnswer = ans2.trim().replace("*", ""); //get rid of * and add to list
+                    cAnsIndex = j; //set the correct answer index
+                    possibleAnsEdited.add(qAnswer);
+                }
+                else {
+                    possibleAnsEdited.add(ans2.trim());
                 }
             }
+//            for (String ans : possibleAnswers) { //go through each answer and put in a list
+////                get the array index of the correct answer
+//                possibleAnsEdited.add(ans.trim().replace("*", ""));
+//                if (ans.contains("*")) { //correct answer, hide the solution symbol
+//                    qAnswer = ans.trim().replace("*", "");
+//                    cAnsIndex = ansIndex; //set the correct answer index
+//                } else {
+//                    ++ansIndex; //increment the answer index to the next answer
+////                    Log.d(TAG, "parser: " + ans + " " + ansIndex + " " + cAnsIndex);
+//                }
+//            }
 
-            sQuestions.add(new QuizQuestion(questionText, Utils.getqType(possibleAnsEdited), quiz.getWeekNum(), qAnswer, cAnsIndex, i, possibleAnsEdited)); //add to list
+            //get the question type
+            qType = Utils.getqType(possibleAnsEdited.size());
+            qz = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
+            sQuestions.add(qz); //add to list
             ++qNum;
         }
         isFinishedParsing = true; //set the parsing to finished
@@ -157,7 +182,6 @@ public class QuestionParser {
     }
 
     public static void setQuizOfQuizzes(List<QuizQuestion> quizzes, int index) {
-        //quizOfQuizzes.add(quizzes);
         quizOfQuizzes.set(index, quizzes);
     }
 }

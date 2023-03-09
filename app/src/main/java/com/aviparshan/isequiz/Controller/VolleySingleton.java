@@ -18,7 +18,6 @@ import java.util.Objects;
  */
 public class VolleySingleton {
 
-
     private static VolleySingleton instance;
     private RequestQueue requestQueue;
     private static Context ctx;
