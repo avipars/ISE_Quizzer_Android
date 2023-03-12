@@ -379,18 +379,18 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
                 }
                 //get all answers as a list and display them in the possible answers text view, with a newline between each answer
             }
-            answerTextView.setVisibility(View.VISIBLE);
-            answerTextView.setText(question.getCorrectAnswer());
-            allAnswersTextView.setVisibility(View.VISIBLE);
-//            if (question.getShowAnswer()) { //hide unless clicked
-//                answerTextView.setVisibility(View.VISIBLE);
-//                answerTextView.setText(question.getCorrectAnswer());
-//                allAnswersTextView.setVisibility(View.GONE);
-//            } else {
-//                answerTextView.setVisibility(View.GONE);
-//                answerTextView.setText("");
-//                allAnswersTextView.setVisibility(View.VISIBLE);
-//            }
+//            answerTextView.setVisibility(View.VISIBLE);
+//            answerTextView.setText(question.getCorrectAnswer());
+//            allAnswersTextView.setVisibility(View.VISIBLE);
+            if (question.getShowAnswer()) { //hide unless clicked
+                answerTextView.setVisibility(View.VISIBLE);
+                answerTextView.setText(question.getCorrectAnswer());
+                allAnswersTextView.setVisibility(View.GONE);
+            } else {
+                answerTextView.setVisibility(View.GONE);
+                answerTextView.setText("");
+                allAnswersTextView.setVisibility(View.VISIBLE);
+            }
 
 
         }

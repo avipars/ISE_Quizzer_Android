@@ -238,6 +238,10 @@ public class WeekView extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_questions, menu);
         MenuItem item = menu.findItem(R.id.actionSearch);
         startSearch(item);
+
+        //set up the checkbox for toggling answers
+        MenuItem toggleAnswers = menu.findItem(R.id.action_toggle_answers);
+        toggleAnswers.setChecked(Utils.getToggleState(this));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -259,10 +263,12 @@ public class WeekView extends AppCompatActivity {
             }
             return true;
         } else if (id == R.id.action_toggle_answers) {
-            //toggle the answers
-            boolean val = !item.isChecked();
-            adapter.setAllAnswers(val);
-            item.setChecked(val);
+            //toggle the answers and save the state of the toggle
+            boolean toggle = !item.isChecked();
+            adapter.setAllAnswers(toggle);
+            item.setChecked(toggle); //toggle the check
+            Utils.setToggleState(this, item.isChecked());
+
             return true;
         } else if (id == R.id.actionSearch) {
             //search

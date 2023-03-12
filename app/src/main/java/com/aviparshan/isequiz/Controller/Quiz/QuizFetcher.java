@@ -55,7 +55,6 @@ public class QuizFetcher {
         void onQuizzesFetched(List<Quiz> quiz);
 
         void onFetchError(Exception error);
-
     }
 
     private class FetchQuizzesTask extends AsyncTask<Void, Void, List<Quiz>> {
@@ -100,6 +99,7 @@ public class QuizFetcher {
                     String quizSubject = quizJson.getString("subject");
                     String quizUrl = quizJson.getString("path");
                     quizzes.add(new Quiz(quizNumber, quizSubject, quizUrl));
+
                 }
                 //    now save the quizzes to the database
             } catch (IOException | JSONException e) {

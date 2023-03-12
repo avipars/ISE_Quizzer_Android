@@ -4,14 +4,18 @@ package com.aviparshan.isequiz.Controller;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.aviparshan.isequiz.BuildConfig;
+import com.aviparshan.isequiz.Models.Quiz;
+import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,9 +29,7 @@ public class Utils {
     public static final int MULTIPLE_CHOICE = 1;
     public static final int OPEN_ANSWER = 2;
     public static final int UNKNOWN = 3;
-
     public static final String QUIZZES_URL = "quizzes.json";
-
     public static final char OPEN = '~', ANSWER = '@', QUESTION = '$', SOLUTION = '*', WEEK_NUM = '#';
     public static final String OPEN_S = "~", ANSWER_S = "@", QUESTION_S = "$", SOLUTION_S = "*", WEEK_NUM_S = "#";
 
@@ -43,6 +45,21 @@ public class Utils {
         return charToString(c);
     }
 
+    /**
+     * Parse get all the quizzes filled with their respective questions
+     * @return list of quizzes
+     */
+//    public static List<Quiz> parseAll(String response){
+//
+//        List<Quiz> quizzes = new ArrayList<>();
+//        String questionText = "";
+//        List<QuizQuestion> questions = new ArrayList<>();
+//        Quiz quiz;
+//        QuizQuestion question;
+//        String trimmed;
+//
+//
+//    }
     /**
      * get the question type given the possible answers list size
      */
@@ -62,6 +79,27 @@ public class Utils {
         }
     }
 
+    public static boolean getToggleState(Context context){
+        //use shared preferences to save the state
+        SharedPreferences sharedPref = context.getSharedPreferences("ise_prefs", Context.MODE_PRIVATE);
+        return sharedPref.getBoolean("toggle_state", false);
+    }
+
+    public static void setToggleState(boolean state, Context context){
+        //use shared preferences to save the state
+        SharedPreferences sharedPref = context.getSharedPreferences("ise_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("toggle_state", state);
+        editor.apply();
+    }
+
+    public static void setToggleState(Context context){
+        setToggleState(!getToggleState(context), context);
+    }
+
+    public static void setToggleState(Context context, boolean state){
+        setToggleState(state, context);
+    }
     public static boolean isConnectedToInternet(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

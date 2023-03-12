@@ -53,7 +53,7 @@ public class QuizQuestion implements Serializable {
 //   set the static week number
 
     public void setWeekNum(int weekNum) { //only have 12 weeks worth of questions
-        if (weekNum >= 0 && weekNum <= 12) {
+        if (weekNum >= 1 && weekNum <= 12) {
             this.weekNum = weekNum;
         } else {
             this.weekNum = -1;
@@ -93,7 +93,8 @@ public class QuizQuestion implements Serializable {
     }
 
     public void setqType(int type) {
-        if(type == Utils.UNKNOWN){
+        if(type != Utils.MULTIPLE_CHOICE && type != Utils.TRUE_FALSE && type != Utils.OPEN_ANSWER) {
+            qType = Utils.UNKNOWN;
             throw new IllegalArgumentException("setqType: type is UNKNOWN");
         } else {
             qType = type;

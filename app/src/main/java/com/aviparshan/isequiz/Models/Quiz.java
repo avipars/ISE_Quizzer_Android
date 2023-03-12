@@ -4,6 +4,7 @@ package com.aviparshan.isequiz.Models;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * ISE Quiz
@@ -14,7 +15,7 @@ public class Quiz implements Serializable {
     public static double version = -1.0;
     private String subject, url, week;
     private int weekNum;
-
+    private List<QuizQuestion> list;
     public Quiz(int num, String subject, String url) {
         this.subject = subject;
         this.url = url;
@@ -43,6 +44,14 @@ public class Quiz implements Serializable {
             this.weekNum = -1;
             this.week = "Week -1";
         }
+    }
+
+    public List<QuizQuestion> getList() {
+        return list;
+    }
+
+    public void setList(List<QuizQuestion> questions) {
+        this.list = questions;
     }
 
     public String getWeek() {
