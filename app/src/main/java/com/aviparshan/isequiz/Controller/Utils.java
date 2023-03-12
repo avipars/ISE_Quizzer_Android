@@ -80,7 +80,7 @@ public class Utils {
     public static boolean getToggleState(Context context){
         //use shared preferences to save the state
         SharedPreferences sharedPref = context.getSharedPreferences("ise_prefs", Context.MODE_PRIVATE);
-        return sharedPref.getBoolean("toggle_state", false);
+        return sharedPref.getBoolean("toggle_state", true);
     }
 
     public static void setToggleState(boolean state, Context context){

@@ -20,6 +20,7 @@
     <item
         android:id="@+id/action_toggle_answers"
         android:orderInCategory="102"
+        android:checked="true"
         android:title="@string/toggle_answers"
         android:checkable="true"
         app:actionViewClass="android.widget.CheckBox"

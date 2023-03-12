@@ -112,7 +112,6 @@ public class WeekView extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 //save as byte array then into asset
-                byte[] bytes = response.getBytes(); // convert String to byte array
 
                 quizQuestionList = QuestionParser.parser(response, quiz);
                 // wait until the parsing is done

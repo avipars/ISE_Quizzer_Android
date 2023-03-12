@@ -152,7 +152,15 @@ public class QuestionParser {
                 if(BuildConfig.DEBUG) {
                     Log.e(TAG, "parser index <=-1: " + s + " " + index);
                 }
-                continue;
+                if(quiz.getWeekNum() == 13){
+                    //skip the next two lines then continue
+                    i += 2;
+                    continue;
+                    //move the index to the next question
+
+                }else{
+                    continue;
+                }
             }
             questionText = s.substring(0, index).trim(); // get the question text
             if (questionText.isEmpty()) continue; //empty string, break (EOF)
