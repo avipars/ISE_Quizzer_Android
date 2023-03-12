@@ -28,5 +28,6 @@
     <string name="issue_parsing">Issue while parsing quiz</string>
     <string name="open_answer">Open Answer</string>
     <string name="true_false">True or False</string>
+    <string name="search_all_quizzes">Search All Quizzes</string>
 
 </resources>

@@ -1,6 +1,5 @@
 package com.aviparshan.isequiz.View;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -35,7 +34,6 @@ public class Main extends AppCompatActivity {
     private static final String TAG = Main.class.getSimpleName();
     private RecyclerView recyclerView;
     private List<Quiz> quizzes;
-
 
     private QuizFetcher quizFetcher;
 
@@ -230,8 +228,16 @@ public class Main extends AppCompatActivity {
         else if(id == R.id.actionSearch){
 //            search for all questions in all quizzes
 //            search through all quizzes and all questions
+
             return true;
         }
+//        else if(id == R.id.actionSearchQuiz){
+////            search for all questions in all quizzes
+////            get the search query
+//            String query = item.getTitle().toString();
+//            startSearch(query);
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }

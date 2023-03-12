@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": 1.02,
   "quizzes": [
     {
       "number": 1,
@@ -60,6 +60,11 @@
       "number": 12,
       "subject": "Software Configuration (version control)",
       "path": "https://raw.githubusercontent.com/edenpro2/ISE-Quizzer/master/Quizzes/q_12.txt"
+    },
+    {
+      "number": 13,
+      "subject": "All Questions",
+      "path": "https://www.aviparshan.com/jct/ise/quiz_13.txt"
     }
   ]
 }

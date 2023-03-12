@@ -77,6 +77,7 @@ public class QuizFetcher {
 
                 } catch (IOException e) {
                     Utils.errorMessage(mContext, "Error fetching quizzes.json", R.string.error_fetch, TAG);
+                    //getFromURL();
                     return null;
                 }
 

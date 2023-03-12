@@ -11,12 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aviparshan.isequiz.BuildConfig;
-import com.aviparshan.isequiz.Models.Quiz;
-import com.aviparshan.isequiz.Models.QuizQuestion;
 import com.aviparshan.isequiz.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ISE Quiz
@@ -30,6 +25,8 @@ public class Utils {
     public static final int OPEN_ANSWER = 2;
     public static final int UNKNOWN = 3;
     public static final String QUIZZES_URL = "quizzes.json";
+    public static final String QUIZZES2_URL = "https://wwww.aviparshan.com/jct/ise/quizzes.json";
+
     public static final char OPEN = '~', ANSWER = '@', QUESTION = '$', SOLUTION = '*', WEEK_NUM = '#';
     public static final String OPEN_S = "~", ANSWER_S = "@", QUESTION_S = "$", SOLUTION_S = "*", WEEK_NUM_S = "#";
 
@@ -45,6 +42,7 @@ public class Utils {
         return charToString(c);
     }
 
+    public static final int MaxWeeks = 13;
     /**
      * Parse get all the quizzes filled with their respective questions
      * @return list of quizzes

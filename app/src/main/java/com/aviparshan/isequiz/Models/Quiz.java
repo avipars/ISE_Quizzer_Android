@@ -3,6 +3,8 @@ package com.aviparshan.isequiz.Models;
 
 import androidx.annotation.NonNull;
 
+import com.aviparshan.isequiz.Controller.Utils;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class Quiz implements Serializable {
     }
 
     public void setWeekNum(int num) {
-        if (num >= 1 && num <= 12) {
+        if (num >= 1 && num <= Utils.MaxWeeks) {
             this.weekNum = num;
             //take the week stirng from the xml
             this.week = String.format("Week %s", num);

@@ -2,11 +2,9 @@ package com.aviparshan.isequiz.Controller.Questions;
 
 
 import static com.aviparshan.isequiz.Controller.Utils.cToS;
-import static com.aviparshan.isequiz.Controller.Utils.getqType;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.aviparshan.isequiz.BuildConfig;
 import com.aviparshan.isequiz.Controller.Utils;
@@ -142,9 +140,10 @@ public class QuestionParser {
                 possibleAnswers = new ArrayList<String>(
                         Arrays.asList(trimmed.substring(1).split("~"))); //still put in array
                 qAnswer = possibleAnswers.get(0); //get the answer
-                qz = new QuizQuestion(questionText, Utils.OPEN_ANSWER, quiz.getWeekNum(), qAnswer, 0, qNum, possibleAnswers);
+                qType = Utils.OPEN_ANSWER;
+                qz = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, 0, i, possibleAnswers);
                 sQuestions.add(qz); //add to list
-                ++qNum;
+                //++qNum;
                 continue; //skip to next question
             }
             //skip the first block (empty) or contains
@@ -196,10 +195,9 @@ public class QuestionParser {
 //            }
 
             //get the question type based on # of entries
-            qType = Utils.getqType(possibleAnsEdited.size());
-            qz = new QuizQuestion(questionText, qType, quiz.getWeekNum(), qAnswer, cAnsIndex, qNum, possibleAnsEdited);
+            qz = new QuizQuestion(questionText, Utils.getqType(possibleAnsEdited.size()), quiz.getWeekNum(), qAnswer, cAnsIndex, i, possibleAnsEdited);
             sQuestions.add(qz); //add to list
-            ++qNum;
+            //++qNum;
         }
         isFinishedParsing = true; //set the parsing to finished
         quiz.setList(sQuestions);

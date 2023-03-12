@@ -53,7 +53,7 @@ public class QuizQuestion implements Serializable {
 //   set the static week number
 
     public void setWeekNum(int weekNum) { //only have 12 weeks worth of questions
-        if (weekNum >= 1 && weekNum <= 12) {
+        if (weekNum >= 1 && weekNum <= Utils.MaxWeeks) {
             this.weekNum = weekNum;
         } else {
             this.weekNum = -1;

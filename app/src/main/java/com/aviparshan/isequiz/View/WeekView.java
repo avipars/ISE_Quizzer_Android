@@ -4,7 +4,6 @@ package com.aviparshan.isequiz.View;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,6 +111,9 @@ public class WeekView extends AppCompatActivity {
 
             @Override
             public void onResponse(String response) {
+                //save as byte array then into asset
+                byte[] bytes = response.getBytes(); // convert String to byte array
+
                 quizQuestionList = QuestionParser.parser(response, quiz);
                 // wait until the parsing is done
                 if (QuestionParser.isIsFinishedParsing()) {
